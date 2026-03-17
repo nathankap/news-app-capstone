@@ -1,0 +1,49 @@
+(1)
+initalize variable called "largest number" with value 0
+user inputs a number
+if number is positive
+    if number than largest number
+        change largest number to number
+    request user input until user enters a zero
+    
+if number is zero
+    output largest number
+
+(2)
+request input from user
+store input into variable called "first_name"
+print variable "first_name"
+print "Hello, World"
+
+(3)
+initialize variable called "sum" with value 0
+initialize variable called "count" with value 0
+
+while there are still integers to be read
+    read integer
+    add the integer to the variable "sum"
+    add 1 to the variable "count"
+
+if count is greater than 0
+    return sum divided by count
+
+(4)
+request list input from user
+
+reorganize list into alphebetical order
+
+while the first item on the list exists
+    if item is already bought
+        remove item from the list
+    go to the next item on the list
+
+print the list
+
+(5)
+user inputs X and Y 
+
+store variable "S" with the sum of X + Y 
+store variable "A" with variable S divided by 2
+store variable "P" with the product of X * Y 
+
+print S, A, and P
