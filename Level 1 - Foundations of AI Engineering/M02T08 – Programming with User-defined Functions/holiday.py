@@ -25,7 +25,8 @@ def holiday_cost(num_nights, city_flight, rental_days):
 
 city_flight = input("Enter the city you are flying to (LAX, IND, ORD): ")
 num_nights = int(input("Enter the number of nights you will be staying: "))
-rental_days = int(input("Enter the number of days you will be renting a car: "))
+rental_days = int(input(
+    "Enter the number of days you will be renting a car: "))
 
 total = holiday_cost(num_nights, city_flight, rental_days)
 print(f"The total cost of your holiday is: ${total}")
