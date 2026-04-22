@@ -161,7 +161,6 @@ def re_stock():
     print(shoe_list[lowest_quantity_idx])
     print("********************************")
 
-
     # Ask user to add quantity of shoes
     while True:
         answer = input("\nWould you like to add quantity of shoes? "
