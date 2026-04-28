@@ -142,6 +142,29 @@ def view_all():
     input("\nEnter any character to return to the main menu.\n")
 
 
+def update_inventory(updated_shoe):
+    '''
+    This helper function will update the new quantity in inventory.txt 
+    based on the current value in shoe_list[].
+    '''
+    try:
+        with open("inventory.txt", "r") as file:  # Open file as read
+            lines = file.readlines()
+
+        with open("inventory.txt", "w") as file:  # Open file as write
+            file.write(lines[0])  # Write header line
+            # Read line by line until matching code is found
+            for line in lines[1:]:
+                shoe = line.split(",")
+                if shoe[1] == updated_shoe.code:
+                    # Update the line with new quantity
+                    line = (f"{shoe[0]},{shoe[1]},{shoe[2]},"
+                            f"{shoe[3]},{updated_shoe.quantity}\n")
+                file.write(line)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
 def re_stock():
     '''
     This function will find the shoe object with the lowest quantity,
@@ -171,6 +194,7 @@ def re_stock():
                 try:
                     new_quantity = int(input("Enter quantity to add: "))
                     shoe_list[lowest_quantity_idx].quantity += new_quantity
+                    update_inventory(shoe_list[lowest_quantity_idx])
                     print("\nAdded successfully!")
                     print(f"\nQuantity added: '{new_quantity}'")
                     print("New quantity: "
