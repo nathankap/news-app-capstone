@@ -63,7 +63,7 @@ def read_shoes_data():
             next(file)
             # Read line by line and save object parameters
             for line in file:
-                shoe = line.split(",")
+                shoe = line.strip().split(",")
                 shoe_obj = Shoe(shoe[0], shoe[1], shoe[2],
                                 shoe[3], shoe[4])
                 shoe_list.append(shoe_obj)
