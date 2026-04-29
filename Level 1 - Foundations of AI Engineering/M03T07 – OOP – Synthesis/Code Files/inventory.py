@@ -144,7 +144,7 @@ def view_all():
 
 def update_inventory(updated_shoe):
     '''
-    This helper function will update the new quantity in inventory.txt 
+    This helper function will update the new quantity in inventory.txt
     based on the current value in shoe_list[].
     '''
     try:
