@@ -156,11 +156,12 @@ def update_inventory(updated_shoe):
             # Read line by line until matching code is found
             for line in lines[1:]:
                 shoe = line.split(",")
-                if shoe[1] == updated_shoe.code:
+                if shoe[1].strip() == updated_shoe.code.strip():
                     # Update the line with new quantity
                     line = (f"{shoe[0]},{shoe[1]},{shoe[2]},"
                             f"{shoe[3]},{updated_shoe.quantity}\n")
                 file.write(line)
+
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
