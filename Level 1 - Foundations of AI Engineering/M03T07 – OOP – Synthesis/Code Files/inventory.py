@@ -1,5 +1,5 @@
 from tabulate import tabulate
-
+import re
 
 # ========The beginning of the class==========
 class Shoe:
@@ -71,6 +71,23 @@ def read_shoes_data():
         print(f"An unexpected error occurred: {e}")
 
 
+def _check_code():
+    '''
+    This helper function will ask for and check if user inputted code
+    is duplicate and/or correct. Return code if new code is validated.
+    '''
+    while True:
+        new_code = input("Enter code: ")
+        if not re.match(r'^SKU\d{5}$', new_code):
+            print("Invalid code format. Code must be SKU followed by 5 digits.\n")
+        elif any(shoe.code == new_code for shoe in shoe_list):
+            print("Code already exists.")
+        else:
+            return new_code
+            
+
+
+
 def capture_shoes():
     '''
     This function will allow a user to capture data
@@ -82,8 +99,8 @@ def capture_shoes():
     print("\nCapture new product data\n")
     country = input("Enter country: ")
     print(f"Country saved as '{country}'")
-    code = input("Enter code: ")
-    print(f"Code saved as '{code}'")
+    code = _check_code()
+    print(f"Code saved as '{code}")
     product = input("Enter product: ")
     print(f"Product saved as '{product}'")
 
@@ -147,6 +164,7 @@ def update_inventory(updated_shoe):
     This helper function will update the new quantity in inventory.txt
     based on the current value in shoe_list[].
     '''
+    
     try:
         with open("inventory.txt", "r") as file:  # Open file as read
             lines = file.readlines()
@@ -159,7 +177,8 @@ def update_inventory(updated_shoe):
                 if shoe[1].strip() == updated_shoe.code.strip():
                     # Update the line with new quantity
                     line = (f"{shoe[0]},{shoe[1]},{shoe[2]},"
-                            f"{shoe[3]},{updated_shoe.quantity}\n")
+                            f"{shoe[3].strip()},{updated_shoe.quantity}\n")
+
                 file.write(line)
 
     except Exception as e:
@@ -225,7 +244,7 @@ def search_shoe():
 
         # If shoe is found, print and return
         for shoe in shoe_list:
-            if shoe.code == shoe_code:
+            if shoe.code == shoe_code.upper():
                 print("\n\nShoe found!\n")
                 print("********************************")
                 print(shoe)

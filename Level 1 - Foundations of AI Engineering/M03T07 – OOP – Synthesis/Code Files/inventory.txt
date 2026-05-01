@@ -4,7 +4,7 @@ China,SKU90000,Jordan 1,3200,50
 Vietnam,SKU63221,Blazer,1700,19
 United States,SKU29077,Cortez,970,60
 Russia,SKU89999,Air Force 1,2000,43
-Australia,SKU57443,Waffle Racer,2700,4
+Australia,SKU57443,Waffle Racer,2700,50004
 Canada,SKU68677,Air Max 97,3600,13
 Egypt,SKU19888,Dunk SB,1500,26
 Britain,SKU76000,Kobe 4,3400,32
