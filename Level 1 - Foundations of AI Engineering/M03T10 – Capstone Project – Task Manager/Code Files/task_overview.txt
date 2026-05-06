@@ -1,0 +1,6 @@
+# of tasks:                           8
+# of completed tasks:                 1
+# of uncompleted tasks:               7
+# of uncompleted, overdue tasks:      5
+% of tasks incomplete:               12 %
+% of tasks overdue:                  62 %

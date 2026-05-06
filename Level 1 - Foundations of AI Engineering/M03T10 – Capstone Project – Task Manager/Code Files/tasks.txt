@@ -1,4 +1,9 @@
-admin, Register Users with task_manager.py, Use task_manager.py to add the usernames and passwords for all team members that will be using this program., 10 Oct 2019, 20 Oct 2019, No
-admin, Assign initial tasks, Use task_manager.py to assign each team member with appropriate tasks, 10 Oct 2019, 25 Oct 2019, No
-admin, nvm, nvm, nvm, 2026-04-29, No
-dawtte, j, j, j, 2026-04-29, No
+admin, Register a user, Use task manager to add a new user, 2026-05-05, 2026-05-04, Yes
+dawtte, Study for pharm final, Spend every living waking hour grinding and studying, 2026-05-06, 2026-05-04, No
+test, test title, test desc, 2024-10-10, 2026-05-04, No
+dawtte, Another task, Do it, 2025-06-06, 2026-05-04, No
+dawtte, another one, another one, 2026-04-04, 2026-05-04, No
+test, yuhhhhh, yuhhhhhh, 2021-06-11, 2026-05-04, No
+test, i would like to test, i would really like to test if this oworks or not and i hiope it does, 2026-03-03, 2026-05-04, No
+nathan, lets do it again, hope it works this time, 2026-05-05, 2026-05-04, No
+admin, testing again, test test, 2026-05-06, 2026-05-05, No

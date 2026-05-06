@@ -1,0 +1,35 @@
+User (admin) Overview:
+# of tasks:                            1
+% of tasks assigned:                   12 %
+% of completed tasks:                  100 %
+% of uncompleted tasks:                0 %
+% of overdue tasks:                    0 %
+
+User (test) Overview:
+# of tasks:                            3
+% of tasks assigned:                   38 %
+% of completed tasks:                  0 %
+% of uncompleted tasks:                100 %
+% of overdue tasks:                    100 %
+
+User (dawt) Overview:
+# of tasks:                            0
+% of tasks assigned:                   0 %
+% of completed tasks:                  0 %
+% of uncompleted tasks:                0 %
+% of overdue tasks:                    0 %
+
+User (dawtte) Overview:
+# of tasks:                            3
+% of tasks assigned:                   38 %
+% of completed tasks:                  0 %
+% of uncompleted tasks:                100 %
+% of overdue tasks:                    67 %
+
+User (nathan) Overview:
+# of tasks:                            1
+% of tasks assigned:                   12 %
+% of completed tasks:                  0 %
+% of uncompleted tasks:                100 %
+% of overdue tasks:                    0 %
+
