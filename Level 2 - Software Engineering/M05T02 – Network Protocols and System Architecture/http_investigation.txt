@@ -1,0 +1,85 @@
+﻿Command: 
+
+
+bash-3.2$ curl -v https://postman-echo.com/get
+
+
+*******************************************************************
+
+
+Request Headers:
+
+
+> Host: postman-echo.com
+> User-Agent: curl/8.4.0
+> Accept: */*
+
+
+*******************************************************************
+
+
+Response Headers:
+
+
+< date: Wed, 08 Jul 2026 00:20:01 GMT
+< content-type: application/json; charset=utf-8
+< content-length: 184
+< etag: W/"b8-RbR6k1X5TNxzh8ehT8yP4W0TsNI"
+< vary: Accept-Encoding
+< x-envoy-upstream-service-time: 5
+< cf-cache-status: DYNAMIC
+< set-cookie: sails.sid=s%3An3cgezhixk_lDnzvNfa3wSog1e4y09K_.PkSHEuwHaGhuI6M55AbTWcIQY%2Fwg0HFQmNSLkLMiJ4o; Path=/; HttpOnly
+< set-cookie: __cf_bm=F8yBy.kdSpt4OOKF2cKJrposEevwlIFzlCwHa9NLGCc-1783470001.116652-1.0.1.1-oiiLtHIUHFvJRu6sJGqQbtEwWgPq.CuPlvl2JgD1NY85P_31A8JuxqoWcD4G2P1b3kmFl4DRsSL6y1MlTtvle2878MIxdMkXjzYOtTzxhVJ5BtgIZeLeW37gX05WzRxd; HttpOnly; SameSite=None; Secure; Path=/; Domain=postman-echo.com; Expires=Wed, 08 Jul 2026 00:50:01 GMT
+< set-cookie: _cfuvid=bDQ2j..mocjaUDhp0nXdUNs0fEpCVT4vCb4btaXhQRQ-1783470001.116652-1.0.1.1-rq6ii7doyyE25hHWaAA6uM3_hdRSL8nGpTKxznqi9yw; HttpOnly; SameSite=None; Secure; Path=/; Domain=postman-echo.com
+< server: cloudflare
+< cf-ray: a17aebb2fd038662-STL
+
+
+*******************************************************************
+
+
+HTTP Status Code:
+
+< HTTP/2 200 
+
+
+*******************************************************************
+
+
+Connection workflow:
+
+* Trying [2606:4700:7::21d]:443... * Connected to postman-echo.com port 443 * SSL connection using TLSv1.3 * ALPN: server accepted h2 > GET /get HTTP/2 < HTTP/2 200 * Connection #0 to host postman-echo.com left intact
+
+
+*******************************************************************
+*******************************************************************
+
+
+Command:
+
+
+bash-3.2$ curl -X POST https://postman-echo.com/post -d "key=value" -H "Content-Type: application/x-www-form-urlencoded"
+
+
+*******************************************************************
+
+
+1. GET retrieves data, POST sends data
+2. The payload (key=value) contains the data being sent. It is transmitted in the HTTP request body (“content-type”:”application/x-www-form-urlencoded”).
+3. The response body is JSON data of what the server received. The server responds with data in the “form”:{“key”:”value”} field
+
+
+{"args":{},"data":"","files":{},"form":{"key":"value"},"headers":{"host":"postman-echo.com","user-agent":"curl/8.4.0","content-length":"9","content-type":"application/x-www-form-urlencoded","accept":"*/*","x-forwarded-proto":"https","accept-encoding":"gzip, br"},"json":{"key":"value"},"url":"https://postman-echo.com/post"}
+
+
+*******************************************************************
+*******************************************************************
+
+
+Command:
+
+curl -I https://postman-echo.com/status/404 and 403
+
+*******************************************************************
+
+The HTTP status line (HTTP/2 404 and HTTP/2 403) show the error type. The response headers (Content-Type and Content-Length) give more information about the error.
