@@ -38,27 +38,17 @@ def initialize_database(connection):
             title TEXT NOT NULL,
             authorID INTEGER NOT NULL,
             qty INTEGER NOT NULL CHECK (qty >= 0),
+            isbn TEXT,
+            publication_year INTEGER,
+            publisher TEXT,
             FOREIGN KEY (authorID) REFERENCES author(id)
         )
         """
     )
 
-    try:
-        connection.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS idx_book_title_author ON book(title, authorID)"
-        )
-    except sqlite3.IntegrityError:
-        connection.execute(
-            """
-            DELETE FROM book
-            WHERE id NOT IN (
-                SELECT MIN(id) FROM book GROUP BY title, authorID
-            )
-            """
-        )
-        connection.execute(
-            "CREATE UNIQUE INDEX IF NOT EXISTS idx_book_title_author ON book(title, authorID)"
-        )
+    add_column_if_missing(connection, "book", "isbn", "TEXT")
+    add_column_if_missing(connection, "book", "publication_year", "INTEGER")
+    add_column_if_missing(connection, "book", "publisher", "TEXT")
 
     initial_authors = [
         ("Charles Dickens", "England"),
@@ -75,14 +65,14 @@ def initialize_database(connection):
         )
 
     initial_books = [
-        ("A Tale of Two Cities", "Charles Dickens", 30),
-        ("Harry Potter and the Philosopher's Stone", "J.K. Rowling", 40),
-        ("The Lion, the Witch, and the Wardrobe", "C.S. Lewis", 25),
-        ("The Lord of the Rings", "J.R.R. Tolkien", 37),
-        ("Alice's Adventures in Wonderland", "Lewis Carroll", 12),
+        ("A Tale of Two Cities", "Charles Dickens", 30, "9780141439600", 1859, "Penguin Classics"),
+        ("Harry Potter and the Philosopher's Stone", "J.K. Rowling", 40, "9780747532699", 1997, "Bloomsbury"),
+        ("The Lion, the Witch, and the Wardrobe", "C.S. Lewis", 25, "9780064404990", 1950, "HarperCollins"),
+        ("The Lord of the Rings", "J.R.R. Tolkien", 37, "9780261102385", 1954, "HarperCollins"),
+        ("Alice's Adventures in Wonderland", "Lewis Carroll", 12, "9780147515872", 1865, "Penguin Classics"),
     ]
 
-    for title, author_name, qty in initial_books:
+    for title, author_name, qty, isbn, publication_year, publisher in initial_books:
         author_row = connection.execute(
             "SELECT id FROM author WHERE name = ?", (author_name,)
         ).fetchone()
@@ -91,10 +81,10 @@ def initialize_database(connection):
 
         connection.execute(
             """
-            INSERT OR IGNORE INTO book(title, authorID, qty)
-            VALUES (?, ?, ?)
+            INSERT OR IGNORE INTO book(title, authorID, qty, isbn, publication_year, publisher)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (title, author_row["id"], qty),
+            (title, author_row["id"], qty, isbn, publication_year, publisher),
         )
 
     connection.commit()
@@ -122,6 +112,16 @@ def prompt_int(prompt, allow_blank=False, minimum=0):
             print(f"Please enter a value greater than or equal to {minimum}.")
             continue
         return value
+
+
+def prompt_year(prompt):
+    while True:
+        value = prompt_int(prompt, allow_blank=True, minimum=0)
+        if value is None:
+            return None
+        if 1000 <= value <= 9999:
+            return value
+        print("Please enter a valid four-digit year.")
 
 
 def get_author_id(connection, author_name, author_country):
@@ -152,42 +152,13 @@ def find_book(connection, book_id):
     ).fetchone()
 
 
-def find_books_by_title(connection, title):
-    search_term = f"%{title.lower()}%"
-    return connection.execute(
-        """
-        SELECT b.id, b.title, b.authorID, b.qty, a.name AS author_name, a.country AS author_country
-        FROM book AS b
-        LEFT JOIN author AS a ON a.id = b.authorID
-        WHERE LOWER(b.title) LIKE ?
-        ORDER BY b.title
-        """,
-        (search_term,),
-    ).fetchall()
-
-
-def select_book_by_title(connection):
+def search_book_helper(connection):
     while True:
-        search_title = prompt_text("Please enter the book title. ")
-        matches = find_books_by_title(connection, search_title)
-
-        if not matches:
-            print(f"No books matched '{search_title}'. Please try again.\n")
+        book_id = prompt_int("Please enter the book ID of the book you'd like to search. ", minimum=1)
+        book = find_book(connection, book_id)
+        if book is None:
+            print(f"Book with ID ({book_id}) was not found. Please try again.\n")
             continue
-
-        if len(matches) == 1:
-            book = matches[0]
-        else:
-            print("\nMatching books:")
-            for index, book in enumerate(matches, start=1):
-                print(f"{index}. {book['title']}")
-
-            choice = input("Please enter the number of the book you want to select. ").strip()
-            if choice.isdigit() and 1 <= int(choice) <= len(matches):
-                book = matches[int(choice) - 1]
-            else:
-                print("Invalid selection. Please try again.\n")
-                continue
 
         print("\nSelected book:")
         print(f"Book ID: {book['id']}")
@@ -201,10 +172,6 @@ def select_book_by_title(connection):
             return book
 
 
-def search_book_helper(connection):
-    return select_book_by_title(connection)
-
-
 def add_book(connection):
     print("\n*****************\n")
     print("ENTER BOOK")
@@ -213,36 +180,20 @@ def add_book(connection):
     title = prompt_text("Please enter the book title. ")
     author_name = prompt_text("Please enter the author's name. ")
     author_country = prompt_text("Please enter the author's country. ") or "Unknown"
+    isbn = input("Please enter the ISBN (leave blank to skip). ").strip() or None
+    publication_year = prompt_year("Please enter the publication year (leave blank to skip). ")
+    publisher = input("Please enter the publisher (leave blank to skip). ").strip() or None
     qty = prompt_int("Please enter the book quantity. ", minimum=1)
 
     author_id = get_author_id(connection, author_name, author_country)
 
     cursor = connection.cursor()
-    existing_book = cursor.execute(
-        "SELECT id, qty FROM book WHERE title = ? AND authorID = ?",
-        (title, author_id),
-    ).fetchone()
-
-    if existing_book:
-        new_qty = existing_book["qty"] + qty
-        cursor.execute("UPDATE book SET qty = ? WHERE id = ?", (new_qty, existing_book["id"]))
-        connection.commit()
-        print("\nBook already existed; quantity was updated.")
-        print("_________________________\n")
-        print(f"Book ID: {existing_book['id']}")
-        print(f"Title: {title}")
-        print(f"Author: {author_name}")
-        print(f"Author Country: {author_country}")
-        print(f"Quantity: {new_qty}")
-        print("_________________________\n")
-        return
-
     cursor.execute(
         """
-        INSERT INTO book(title, authorID, qty)
-        VALUES (?, ?, ?)
+        INSERT INTO book(title, authorID, qty, isbn, publication_year, publisher)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
-        (title, author_id, qty),
+        (title, author_id, qty, isbn, publication_year, publisher),
     )
     connection.commit()
 
@@ -316,13 +267,17 @@ def search_book(connection):
     print("SEARCH BOOK")
     print("*****************\n")
 
-    book = select_book_by_title(connection)
-    print("Selected book:")
-    print(f"Title: {book['title']}")
-    print(f"Book ID: {book['id']}")
-    print(f"Quantity: {book['qty']}")
-    print(f"Author: {book['author_name'] or 'N/A'}")
-    print(f"Author Country: {book['author_country'] or 'N/A'}")
+    book_id = prompt_int("Please enter the book ID of the book you'd like to search. ", minimum=1)
+    book = find_book(connection, book_id)
+    if book is None:
+        print(f"Book with ID ({book_id}) was not found. Please try again.\n")
+    else:
+        print("Selected book:")
+        print(f"Title: {book['title']}")
+        print(f"Book ID: {book['id']}")
+        print(f"Quantity: {book['qty']}")
+        print(f"Author: {book['author_name'] or 'N/A'}")
+        print(f"Author Country: {book['author_country'] or 'N/A'}")
 
 
 def view_all_books(connection):
