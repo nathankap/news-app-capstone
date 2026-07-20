@@ -24,7 +24,7 @@ def initialize_database(connection):
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS author (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE,
             country TEXT
         )
@@ -34,7 +34,7 @@ def initialize_database(connection):
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS book (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             title TEXT NOT NULL,
             authorID INTEGER NOT NULL,
             qty INTEGER NOT NULL CHECK (qty >= 0),
@@ -61,40 +61,34 @@ def initialize_database(connection):
         )
 
     initial_authors = [
-        ("Charles Dickens", "England"),
-        ("J.K. Rowling", "England"),
-        ("C.S. Lewis", "Ireland"),
-        ("J.R.R. Tolkien", "South Africa"),
-        ("Lewis Carroll", "England"),
+        (1290, "Charles Dickens", "England"),
+        (8937, "J.K. Rowling", "England"),
+        (2356, "C.S. Lewis", "Ireland"),
+        (6380, "J.R.R. Tolkien", "South Africa"),
+        (5620, "Lewis Carroll", "England"),
     ]
 
-    for author_name, author_country in initial_authors:
+    for author_id, author_name, author_country in initial_authors:
         connection.execute(
-            "INSERT OR IGNORE INTO author(name, country) VALUES (?, ?)",
-            (author_name, author_country),
+            "INSERT OR IGNORE INTO author(id, name, country) VALUES (?, ?, ?)",
+            (author_id, author_name, author_country),
         )
 
     initial_books = [
-        ("A Tale of Two Cities", "Charles Dickens", 30),
-        ("Harry Potter and the Philosopher's Stone", "J.K. Rowling", 40),
-        ("The Lion, the Witch, and the Wardrobe", "C.S. Lewis", 25),
-        ("The Lord of the Rings", "J.R.R. Tolkien", 37),
-        ("Alice's Adventures in Wonderland", "Lewis Carroll", 12),
+        (3001, "A Tale of Two Cities", 1290, 30),
+        (3002, "Harry Potter and the Philosopher's Stone", 8937, 40),
+        (3003, "The Lion, the Witch, and the Wardrobe", 2356, 25),
+        (3004, "The Lord of the Rings", 6380, 37),
+        (3005, "Alice's Adventures in Wonderland", 5620, 12),
     ]
 
-    for title, author_name, qty in initial_books:
-        author_row = connection.execute(
-            "SELECT id FROM author WHERE name = ?", (author_name,)
-        ).fetchone()
-        if not author_row:
-            continue
-
+    for book_id, title, author_id, qty in initial_books:
         connection.execute(
             """
-            INSERT OR IGNORE INTO book(title, authorID, qty)
-            VALUES (?, ?, ?)
+            INSERT OR IGNORE INTO book(id, title, authorID, qty)
+            VALUES (?, ?, ?, ?)
             """,
-            (title, author_row["id"], qty),
+            (book_id, title, author_id, qty),
         )
 
     connection.commit()
