@@ -124,6 +124,17 @@ def prompt_int(prompt, allow_blank=False, minimum=0):
         return value
 
 
+def validate_id(id_value):
+    """Validate that ID is an integer with exactly 4 digits."""
+    try:
+        id_int = int(id_value)
+        if 1000 <= id_int <= 9999:
+            return True
+        return False
+    except (ValueError, TypeError):
+        return False
+
+
 def get_author_id(connection, author_name, author_country):
     existing_author = connection.execute(
         "SELECT id FROM author WHERE name = ?", (author_name,)
@@ -145,7 +156,7 @@ def find_book(connection, book_id):
         """
         SELECT b.id, b.title, b.authorID, b.qty, a.name AS author_name, a.country AS author_country
         FROM book AS b
-        LEFT JOIN author AS a ON a.id = b.authorID
+        INNER JOIN author AS a ON a.id = b.authorID
         WHERE b.id = ?
         """,
         (book_id,),
@@ -158,7 +169,7 @@ def find_books_by_title(connection, title):
         """
         SELECT b.id, b.title, b.authorID, b.qty, a.name AS author_name, a.country AS author_country
         FROM book AS b
-        LEFT JOIN author AS a ON a.id = b.authorID
+        INNER JOIN author AS a ON a.id = b.authorID
         WHERE LOWER(b.title) LIKE ?
         ORDER BY b.title
         """,
@@ -262,6 +273,10 @@ def update_book(connection):
     print("*****************\n")
 
     book = search_book_helper(connection)
+    if not validate_id(book["id"]):
+        print("Error: Invalid book ID format. Please try again.\n")
+        return
+    
     update_choice = input(
         "\nEnter 'q' to update the quantity, 't' to update the title, "
         "'a' to update the author's name, or 'c' to update the author's country.\n"
@@ -302,6 +317,10 @@ def delete_book(connection):
     print("*****************\n")
 
     book = search_book_helper(connection)
+    if not validate_id(book["id"]):
+        print("Error: Invalid book ID format. Please try again.\n")
+        return
+    
     confirm = input("Proceed with deleting this book? (y/n) ").strip().lower()
     if confirm in {"y", "yes"}:
         connection.execute("DELETE FROM book WHERE id = ?", (book["id"],))
@@ -334,7 +353,7 @@ def view_all_books(connection):
         """
         SELECT b.id, b.title, a.name AS author_name, a.country AS author_country, b.qty
         FROM book AS b
-        JOIN author AS a ON a.id = b.authorID
+        INNER JOIN author AS a ON a.id = b.authorID
         ORDER BY b.id
         """
     ).fetchall()
