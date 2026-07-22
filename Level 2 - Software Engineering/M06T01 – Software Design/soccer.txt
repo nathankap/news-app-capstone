@@ -1,0 +1,15 @@
+Models
+- define task model to represent tasks with attributes such as:
+   - name
+   - description
+   - link
+   - due date
+   - completion status
+
+Views
+- display a task list
+- accept user commands to add, edit, and delete tasks
+- fetch task data
+
+Controllers
+- handle user requests to add, edit, delete, and view tasks
