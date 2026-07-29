@@ -1,15 +1,32 @@
-Models
-- define task model to represent tasks with attributes such as:
+Model
+- The model will be a database storing User's, Training Plan's, and Task's.
+- The User class will be stored with:
+   - user_id
+   - name
+   - email
+- The Training Plan class will be stored with:
+   - plan_id
+   - name
+   - start_date
+   - end_date
+   - tasks
+   - functionality to add tasks, remove tasks, and get current progress of tasks
+- The Task class will be stored with:
    - name
    - description
    - link
-   - due date
-   - completion status
+   - due_date
+   - completion
+   - functionality to mark task as complete, update the status, and check if the task is overdue
+- The Model will be responsible for data validation, handling logic, and directly handling data storage.
 
-Views
-- display a task list
-- accept user commands to add, edit, and delete tasks
-- fetch task data
+View
+- The View will be responsible for formatting the presentation layer for the user without including any
+  business logic. Responsibilities include:
+   - display a task list
+   - accept user commands to add, edit, and delete tasks
 
-Controllers
-- handle user requests to add, edit, delete, and view tasks
+Controller
+- The Controller will be responsible for acting as an intermediary between the Model and View. It takes
+  the user input from the View, validates user's authority, then calls the Model to either update or fetch
+  the data. 
