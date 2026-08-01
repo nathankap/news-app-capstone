@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "user_id": 1,
+      "name": "Soccer Training Manager",
+      "email": "coach@example.com",
+      "plans": [
+        {
+          "plan_id": 1,
+          "name": "Soccer Training Plan",
+          "start_date": "2026-08-01",
+          "end_date": "2026-08-15",
+          "tasks": [
+            {
+              "task_id": 1,
+              "name": "dribbling",
+              "description": "100 touches a day",
+              "link": "none",
+              "due_date": "2026-12-30",
+              "completion": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
