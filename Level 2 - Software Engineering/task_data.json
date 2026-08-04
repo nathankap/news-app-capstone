@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "user_id": 1,
+      "name": "Soccer Training Manager",
+      "email": "coach@example.com",
+      "plans": [
+        {
+          "plan_id": 1,
+          "name": "Soccer Training Plan",
+          "start_date": "2026-08-03",
+          "end_date": "2026-08-17",
+          "tasks": []
+        }
+      ]
+    }
+  ]
+}

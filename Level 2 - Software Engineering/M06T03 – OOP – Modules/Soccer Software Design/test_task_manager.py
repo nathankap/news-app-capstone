@@ -20,7 +20,14 @@ class FakeStorage:
 
 def test_task_is_overdue_and_status_updates() -> None:
     yesterday = date.today() - timedelta(days=1)  # noqa: DTZ011
-    task = Task(task_id=1, name="Practice", description="", link="", due_date=yesterday, completion=False)
+    task = Task(
+        task_id=1,
+        name="Practice",
+        description="",
+        link="",
+        due_date=yesterday,
+        completion=False,
+    )
 
     assert task.is_overdue() is True
     assert task.status == "Overdue"
@@ -37,8 +44,26 @@ def test_training_plan_progress_calculation() -> None:
         start_date=date.today(),  # noqa: DTZ011
         end_date=date.today() + timedelta(days=7),  # noqa: DTZ011
     )
-    plan.add_task(Task(task_id=1, name="Warm-up", description="", link="", due_date=date.today(), completion=False))  # noqa: DTZ011
-    plan.add_task(Task(task_id=2, name="Fitness", description="", link="", due_date=date.today(), completion=True))  # noqa: DTZ011
+    plan.add_task(
+        Task(
+            task_id=1,
+            name="Warm-up",
+            description="",
+            link="",
+            due_date=date.today(),  # noqa: DTZ011
+            completion=False,
+        )
+    )
+    plan.add_task(
+        Task(
+            task_id=2,
+            name="Fitness",
+            description="",
+            link="",
+            due_date=date.today(),  # noqa: DTZ011
+            completion=True,
+        )
+    )
 
     assert plan.get_progress() == 50.0
 
@@ -69,7 +94,9 @@ def test_controller_add_edit_delete_task() -> None:
         name="Dribbling Session",
         description="Use both feet",
         link="http://example.com/dribbling-session",
-        due_date=(date.today() + timedelta(days=1)).isoformat(),  # noqa: DTZ011
+        due_date=(
+            date.today() + timedelta(days=1)
+        ).isoformat(),  # noqa: DTZ011
         completion=True,
     )
 

@@ -23,27 +23,49 @@ def main() -> None:
         try:
             if choice == "1":
                 tasks = controller.list_tasks()
-                display_tasks(tasks, controller.get_active_plan().name, controller.get_progress())
+                plan_name = controller.get_active_plan().name
+                progress = controller.get_progress()
+                display_tasks(tasks, plan_name, progress)
 
             elif choice == "2":
                 name = prompt_input("Task name")
                 description = prompt_input("Task description")
                 link = prompt_input("Task link")
                 due_date = prompt_date("Task due date (YYYY-MM-DD)")
-                controller.add_task(name=name, description=description, link=link, due_date=due_date)
+                controller.add_task(
+                    name=name,
+                    description=description,
+                    link=link,
+                    due_date=due_date,
+                )
                 display_message("Task added successfully.")
 
             elif choice == "3":
                 tasks = controller.list_tasks()
-                display_tasks(tasks, controller.get_active_plan().name, controller.get_progress())
+                plan_name = controller.get_active_plan().name
+                progress = controller.get_progress()
+                display_tasks(tasks, plan_name, progress)
                 task_id = int(prompt_input("Task ID to edit"))
                 task = controller._find_task(task_id)
                 name = prompt_input("New task name", task.name)
                 description = prompt_input("New description", task.description)
                 link = prompt_input("New link", task.link)
-                due_date = prompt_date("New due date (YYYY-MM-DD)", task.due_date.isoformat())
-                completed = prompt_input("Is the task complete? (yes/no)", "yes" if task.completion else "no").lower() in ["yes", "y"]
-                controller.edit_task(task_id=task_id, name=name, description=description, link=link, due_date=due_date, completion=completed)
+                due_date = prompt_date(
+                    "New due date (YYYY-MM-DD)", task.due_date.isoformat()
+                )
+                default_completed = "yes" if task.completion else "no"
+                completed_answer = prompt_input(
+                    "Is the task complete? (yes/no)", default_completed
+                ).lower()
+                completed = completed_answer in ["yes", "y"]
+                controller.edit_task(
+                    task_id=task_id,
+                    name=name,
+                    description=description,
+                    link=link,
+                    due_date=due_date,
+                    completion=completed,
+                )
                 display_message("Task updated successfully.")
 
             elif choice == "4":
