@@ -55,7 +55,8 @@ def main() -> None:
                 )
                 default_completed = "yes" if task.completion else "no"
                 completed_answer = prompt_input(
-                    "Is the task complete? (yes/no)", default_completed
+                    "Is the task complete? (yes/no)",
+                    default_completed,
                 ).lower()
                 completed = completed_answer in ["yes", "y"]
                 controller.edit_task(
@@ -84,19 +85,25 @@ def main() -> None:
                 tasks = controller.list_tasks()
                 completed_count = sum(1 for task in tasks if task.completion)
                 pending_count = len(tasks) - completed_count
-                display_message(
-                    f"Training plan progress: {controller.get_progress()}%\n"
-                    f"Completed tasks: {completed_count}\n"
-                    f"Pending tasks: {pending_count}\n"
-                    f"Total tasks: {len(tasks)}"
+                progress = controller.get_progress()
+                progress_message = "\n".join(
+                    [
+                        f"Training plan progress: {progress}%",
+                        f"Completed tasks: {completed_count}",
+                        f"Pending tasks: {pending_count}",
+                        f"Total tasks: {len(tasks)}",
+                    ]
                 )
+                display_message(progress_message)
 
             elif choice == "7":
                 display_message("Exiting the task manager. Goodbye!")
                 break
 
             else:
-                display_message("Please choose a valid option between 1 and 7.")
+                display_message(
+                    "Please choose a valid option between 1 and 7."
+                )
 
         except ValueError as error:
             display_message(f"Error: {error}")

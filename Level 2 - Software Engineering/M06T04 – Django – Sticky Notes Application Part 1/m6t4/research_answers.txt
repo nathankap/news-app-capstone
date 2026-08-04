@@ -1,0 +1,33 @@
+1.
+HTTP is a stateless protocol, meaning the preservation of data in an application
+across multiple request-response cycles should not be possible. However, web applications
+use mechanisms such as cookies, sessions, and authentication tokens to make this preservation
+possible. When a user logs in, the server verifies their credentials and then creates a unique
+session identifier. This identifier is then stored in a 'cookie' that is in the user's browser, 
+then is sent back with every request. The server can use this session identifier to retrieve
+information about the user's session, allowing the user to stay logged in without having to
+re-enter their credentials every time they open a new page.
+
+Modern web applications also use token-based authentication like JSON Web Tokens (JWT's), where
+the client stores a signed token and includes it in the request header of an HTTP request. The
+server validates the token instead of maintaining the entire session data.
+
+To protect user accounts, there are security measures such as (1) HTTPS encryption, (2) secure and
+HttpOnly cookies, (3) session expiration, (4) token expiration, (5) protection against session hijacking,
+(6) cross-site request forgery (CSRF), and many others. These security measures allow HTTP applications
+to maintain a secure session for the user, even though HTTP is a stateless protocol. 
+
+
+2. 
+Django uses a migration system to manage and organize consistent changes to a database. When using
+a server-based relational database such as MariaDB, the user must first configure the database connection
+in Django's settings.py file by specifying the database engine, database name, username, password, host,
+and port. After creating and/or modifying the Django models, the python manage.py makemigrations command
+can be used to generate migration files that describe the required database changes. These migration files
+can be found in the migrations directory and can be tracked using version control. The python manage.py
+migrate command then applies the migrations to the MariaDB database: creating or updating tables, columns,
+indexes, relationships, etc. as needed. Django keeps track of which migrations have already been applied
+using the django_migrations table. This prevents the same migration from executing multiple times. Before
+running migrations on their server, developers usually back up the database and test migrations in a staging
+virtual environment to reduce the risk of data loss or unexpected errors. This migration system makes it easier
+to maintain database consistency across multiple development and production environments.
