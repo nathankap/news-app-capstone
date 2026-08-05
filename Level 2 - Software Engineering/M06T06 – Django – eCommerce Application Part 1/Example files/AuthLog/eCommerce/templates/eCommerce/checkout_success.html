@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Order Confirmed</title>
+</head>
+<body>
+    <h1>Order Confirmed</h1>
+    <p>Thank you for your purchase, {{ order.user.username }}.</p>
+    <p>Your order number is <strong>#{{ order.pk }}</strong>.</p>
+    <p>Total paid: R{{ order.total_price }}</p>
+    <p>An invoice email has been sent to {{ order.user.email }}.</p>
+
+    <h2>Order Items</h2>
+    <ul>
+        {% for item in order.items.all %}
+            <li>{{ item.product.name }} x {{ item.quantity }} @ R{{ item.price }} = R{{ item.price|floatformat:2|add:0 }}</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'eCommerce:products_list' %}"><button>Continue Shopping</button></a>
+</body>
+</html>

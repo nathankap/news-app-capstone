@@ -20,13 +20,13 @@
             <tbody>
                 {% for product in products %}
                     <tr>
-                        <td>{{ product.name }}</td>
+                        <td><a href="{% url 'eCommerce:product_detail' product.id %}">{{ product.name }}</a></td>
                         <td>{{ product.description }}</td>
                         <td>R{{ product.price }}</td>
                         <td>
                             <form method="POST" action="{% url 'eCommerce:add_to_cart' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="item" value="{{ product.name }}">
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
                                 <input type="number" name="quantity" value="1" min="1" style="width: 50px;" />
                                 <button type="submit">Add</button>
                             </form>
@@ -49,6 +49,16 @@
         <a href="{% url 'eCommerce:product_page' %}">
             <button>🔍 Search Product</button>
         </a>
+
+        <a href="{% url 'eCommerce:checkout' %}">
+            <button>✅ Checkout</button>
+        </a>
+
+        {% if is_vendor %}
+            <a href="{% url 'eCommerce:add_product' %}">
+                <button>➕ Add Product</button>
+            </a>
+        {% endif %}
 
         <a href="{% url 'eCommerce:change_price' %}">
             <button>💰 Change Price</button>

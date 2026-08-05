@@ -66,15 +66,11 @@ TEMPLATES = [
 # WSGI application: Entry point for WSGI-compatible web servers
 WSGI_APPLICATION = 'AuthLog.wsgi.application'
 
-# Database settings: Using MySQL here with your database credentials
+# Database settings: Use a relational database engine with SQLite for local development.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Use MySQL database engine
-        'NAME': 'ecommerce_db',                # Your database name
-        'USER': 'root',                        # Your database user
-        'PASSWORD': 'password',                # Your database password
-        'HOST': 'localhost',                   # Database is hosted on your own machine
-        'PORT': '',                           # Default MySQL port (3306)
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -98,15 +94,14 @@ STATIC_URL = 'static/'
 # Default primary key type for models
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email settings to send emails (for example, password reset emails)
-# You can switch to console backend for testing emails in your terminal instead of sending real emails
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # Use SMTP server to send real emails
-EMAIL_FILE_PATH = "/emails/"                                   # Path to save emails if using file backend
-EMAIL_HOST = 'smtp.gmail.com'                                 # Gmail SMTP server
-EMAIL_PORT = 587                                              # SMTP port for TLS
-EMAIL_USE_TLS = True                                          # Use TLS for security
-EMAIL_HOST_USER = 'your_email@gmail.com'                 # Your email address used to send mails
-EMAIL_HOST_PASSWORD = 'your_app_password'                   # Your email password or app password
+# Email settings: use the console backend for development and demonstration.
+# Replace with a real SMTP backend when you want to send actual email from a configured account.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = 'no-reply@authlog.local'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_app_password'
 
