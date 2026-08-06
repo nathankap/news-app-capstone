@@ -1,0 +1,7 @@
+1a. Median
+1b. Mode
+1c. Median
+1d. Median
+
+2a. Standard deviation
+2b. Standard deviation

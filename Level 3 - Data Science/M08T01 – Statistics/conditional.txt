@@ -1,0 +1,12 @@
+1a. 50%
+1b. 50%
+1c. 50%
+
+2.
+
+H: The participant has COVID.
+E: The participant tested positive.
+P(H)    = .70
+P(E|H)  = .9
+P(E)    = .64
+P(H|E)  = .9844
