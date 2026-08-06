@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nathan Kap | CV</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --accent: #1d4ed8;
+      --accent-soft: #dbeafe;
+      --text: #18304b;
+      --muted: #5b6b7a;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #eef4ff 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+
+    .hero, .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 24px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      margin: 0 0 8px;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .pill {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .contact-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .contact-box h2, .card h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .contact-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .contact-list li {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .card {
+      padding: 24px;
+    }
+
+    .card ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .card li { margin-bottom: 8px; }
+
+    .timeline { margin: 0; padding-left: 18px; }
+    .timeline li { margin-bottom: 12px; }
+    .timeline strong { color: var(--accent); }
+
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 800px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      .page { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div>
+        <h1>Nathan Kap</h1>
+        <p>I am a Computer Engineering graduate and current Pre-Silicon Verification Engineer with a strong interest in digital design, hardware verification, embedded systems, and software engineering. My work focuses on building reliable verification environments for RTL designs and improving confidence in complex systems before silicon fabrication.</p>
+        <span class="pill">Pre-Silicon Verification Engineer • Hardware Verification</span>
+      </div>
+      <div class="contact-box">
+        <h2>Contact</h2>
+        <ul class="contact-list">
+          <li>📧 natvlkap@gmail.com </li>
+          <li>🔗 <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a></li>
+          <li>💻 <a href="https://github.com/nathankap" target="_blank" rel="noreferrer">GitHub</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>About Me</h2>
+        <p>I am currently working as a Pre-Silicon Verification Engineer, where I develop verification environments for RTL designs using SystemVerilog, UVM, and UVMF. My responsibilities include creating reusable UVM components, writing constrained-random and directed tests, developing functional coverage, and debugging simulations to ensure designs meet their specifications before fabrication.</p>
+        <p>I graduated from Purdue University with a Bachelor of Science in Computer Engineering in May 2025. My coursework and projects strengthened my foundation in data structures, microprocessor systems, signals and systems, and data science. I am motivated by the challenge of building robust systems and contributing to technology that is reliable and impactful.</p>
+        <p>My career objective is to build a long-term career in hardware verification and digital design while continuing to strengthen my software engineering skills. I am also passionate about leadership and service, including coordinating outreach initiatives and mentoring young people through my church community.</p>
+      </article>
+
+      <article class="card">
+        <h2>Technical Skills</h2>
+        <ul>
+          <li>Hardware verification using SystemVerilog, UVM, UVMF, constrained-random verification, functional coverage, assertions, scoreboards, drivers, monitors, and sequences</li>
+          <li>Programming languages including Python, C, RISC-V Assembly, and MATLAB</li>
+          <li>Embedded systems experience with STM32, ESP32, and MicroPython</li>
+          <li>Software development knowledge in object-oriented programming, data structures, and algorithms</li>
+          <li>Tools such as Git, GitHub, SQLite, Linux, and Visual Studio Code</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Education</h2>
+        <ul class="timeline">
+          <li><strong>Purdue University</strong><br />Bachelor of Science in Computer Engineering — Graduated May 2025</li>
+          <li><strong>Relevant Coursework</strong><br />Data Structures, Microprocessor Systems, Signals & Systems, and Data Science</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Professional Experience</h2>
+        <ul class="timeline">
+          <li><strong>Pre-Silicon Verification Engineer</strong><br />Develop verification environments for RTL designs using SystemVerilog, UVM, and UVMF, write constrained-random and directed tests, and debug simulation failures to improve verification quality.</li>
+          <li><strong>Computer Engineer Intern — ManTech</strong><br />Developed an automated testing solution using Python and SQLite to improve quality assurance for U.S. Navy encoder systems and analyze test data for potential non-conformances.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Selected Projects</h2>
+        <ul class="timeline">
+          <li><strong>STM32 Motorized Painting System</strong><br />Developed embedded C firmware for an STM32-based robotic painting system, implementing motor control logic and safety interlocks.</li>
+          <li><strong>IoT Backpack Anti-Theft Device</strong><br />Designed an ESP32-based security device using MicroPython with motion sensing, Wi-Fi connectivity, and remote notifications.</li>
+          <li><strong>Operating System Kernel (JOS)</strong><br />Implemented virtual memory management, scheduling, system calls, interrupt handling, and basic file system functionality.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Leadership & Community</h2>
+        <ul class="timeline">
+          <li><strong>Project Coordinator — Hope International</strong><br />Coordinate international outreach initiatives and help manage projects across diverse teams.</li>
+          <li><strong>Sunday School Teacher & Music Director</strong><br />Teach weekly Bible lessons, mentor students, and lead worship rehearsals for church services.</li>
+          <li><strong>Youth Executive Committee Board Member</strong><br />Lead youth mentorship initiatives and coordinate events supporting personal and spiritual development.</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer>
+      <p>Designed as a personal online CV to share my background, interests, and professional goals.</p>
+    </footer>
+  </div>
+</body>
+</html>
