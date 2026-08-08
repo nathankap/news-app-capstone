@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ product.name }}</title>
+</head>
+<body>
+    <h1>{{ product.name }}</h1>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Price:</strong> R{{ product.price }}</p>
+    <p><strong>Stock:</strong> {{ product.stock }}</p>
+    <p><strong>Vendor:</strong> {% if product.vendor %}{{ product.vendor.username }}{% else %}Unknown Vendor{% endif %}</p>
+
+    <form method="POST" action="{% url 'eCommerce:add_to_cart' %}">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <label>Quantity:</label>
+        <input type="number" name="quantity" value="1" min="1" style="width: 50px;" />
+        <button type="submit">Add to Cart</button>
+    </form>
+
+    {% if is_vendor and product.vendor == request.user %}
+        <div style="margin-top: 20px;">
+            <a href="{% url 'eCommerce:edit_product' product.id %}"><button>Edit Product</button></a>
+            <a href="{% url 'eCommerce:delete_product' product.id %}"><button>Delete Product</button></a>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'eCommerce:review_product' product.id %}"><button>Write a Review</button></a>
+    </div>
+
+    <h2>Reviews</h2>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>{{ review.user.username }}</strong> - Rating: {{ review.rating }}/5
+                    {% if review.verified %}<em>(Verified)</em>{% endif %}<br>
+                    {{ review.comment }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'eCommerce:products_list' %}"><button>Back to Catalog</button></a>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reddit Feed</title>
+</head>
+<body>
+    <h1>Reddit Feed</h1>
+    {% if posts %}
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <strong>{{ post.title }}</strong><br>
+                    Author: {{ post.author }}<br>
+                    <a href="{{ post.url }}" target="_blank" rel="noopener noreferrer">Open post</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No posts available right now.</p>
+    {% endif %}
+</body>
+</html>
