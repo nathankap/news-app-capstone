@@ -2,9 +2,31 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+
+class Store(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='stores'
+    )
+    name = models.CharField(max_length=150)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.owner.username})"
+
+
 class Product(models.Model):
     vendor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='products',
+        null=True,
+        blank=True,
+    )
+    store = models.ForeignKey(
+        Store,
         on_delete=models.CASCADE,
         related_name='products',
         null=True,
@@ -18,7 +40,8 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return f"{self.name} ({self.vendor.username})"
+        owner = self.store.owner.username if self.store and self.store.owner else (self.vendor.username if self.vendor else 'unknown')
+        return f"{self.name} ({owner})"
 
     class Meta:
         permissions = [

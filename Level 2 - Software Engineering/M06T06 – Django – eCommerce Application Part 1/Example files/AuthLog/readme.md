@@ -2,10 +2,10 @@
 
 # AuthLog Django Project
 
-This is a Django web application project that includes two main apps:
+This is a Django eCommerce web application with two main apps:
 
-* **grabsomore**: Handles user authentication, registration, password reset, and user sessions.
-* **eCommerce**: Basic eCommerce functionality with products, permissions, and a shopping cart.
+* **grabsomore**: Handles login, registration, password reset, and user sessions.
+* **eCommerce**: Supports vendors, stores, products, carts, checkout, order emails, reviews, and permissions.
 
 ---
 
@@ -79,33 +79,41 @@ Before you begin, ensure you have met the following requirements:
 
 ## Database Setup
 
-1. **Create MySQL database:**
+1. **Create the MariaDB/MySQL database and user (example):**
 
-   Login to your MySQL server and create the database:
+   Run the following in your MariaDB/MySQL client (adjust names/passwords):
 
    ```sql
-   CREATE DATABASE ecommerce_db;
+   CREATE DATABASE ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE USER 'ecomuser'@'localhost' IDENTIFIED BY 'strongpassword';
+   GRANT ALL PRIVILEGES ON ecommerce_db.* TO 'ecomuser'@'localhost';
+   FLUSH PRIVILEGES;
    ```
 
-2. **Update database credentials in `AuthLog/settings.py`** if your MySQL username or password differ:
+2. **Configure database connection using environment variables:**
 
-   ```python
-   DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.mysql',
-           'NAME': 'ecommerce_db',
-           'USER': 'root',
-           'PASSWORD': 'your_mysql_password',
-           'HOST': 'localhost',
-           'PORT': '',
-       }
-   }
+   The project reads DB config from environment variables. Set these in your shell or service manager:
+
+   - `DB_ENGINE=mysql` (optional)
+   - `DB_NAME` (e.g. `ecommerce_db`)
+   - `DB_USER` (e.g. `ecomuser`)
+   - `DB_PASSWORD` (e.g. `strongpassword`)
+   - `DB_HOST` (e.g. `localhost`)
+   - `DB_PORT` (optional)
+
+   Example (Windows cmd):
+
+   ```cmd
+   set DB_ENGINE=mysql
+   set DB_NAME=ecommerce_db
+   set DB_USER=ecomuser
+   set DB_PASSWORD=strongpassword
    ```
 
-3. **Install MySQL Python adapter** if not already installed:
+3. **Install MySQL/MariaDB Python adapter** if not already installed:
 
    ```bash
-   pip install mysqlclient
+   pip install -r requirements.txt
    ```
 
 ---
@@ -138,7 +146,7 @@ Before you begin, ensure you have met the following requirements:
 4. **Access the application:**
 
    * Open your browser and go to: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-   * You can login, register new users, browse products, and test password reset functionality.
+   * Use the login page at `/`, register users, browse the catalog at `/ecommerce/`, manage stores at `/ecommerce/stores/`, and test password reset functionality.
 
 ---
 
@@ -153,8 +161,9 @@ Before you begin, ensure you have met the following requirements:
 
 * **eCommerce (`eCommerce` app):**
 
-  * View all products at `/` (root URL, depending on project URL setup)
-  * View product details, change prices (if authorized), add to cart, and view cart.
+  * View the product catalog at `/ecommerce/`
+  * View product details, add to cart, checkout, and leave reviews
+  * Vendors and superusers can manage stores and products from `/ecommerce/stores/` and product creation pages
 
 ---
 

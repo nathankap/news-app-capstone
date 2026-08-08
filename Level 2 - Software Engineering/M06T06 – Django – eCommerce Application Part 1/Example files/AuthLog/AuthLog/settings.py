@@ -67,12 +67,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'AuthLog.wsgi.application'
 
 # Database settings: Use a relational database engine with SQLite for local development.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import os
+
+# Database configuration: prefer MariaDB when environment variables are provided.
+# For local development without MariaDB, you can still use SQLite by omitting
+# the DB_* environment variables.
+if os.getenv('DB_ENGINE') == 'mysql' or os.getenv('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME', 'ecommerce_db'),
+            'USER': os.getenv('DB_USER', 'root'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', ''),
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation helps make sure passwords are strong and safe
 AUTH_PASSWORD_VALIDATORS = [

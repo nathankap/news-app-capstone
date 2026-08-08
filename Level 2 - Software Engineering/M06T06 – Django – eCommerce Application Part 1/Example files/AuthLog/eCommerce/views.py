@@ -4,11 +4,21 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.conf import settings
-from .models import Product, Order, OrderItem, Review
+from .models import Product, Order, OrderItem, Review, Store
 
 
 def is_vendor(user):
-    return user.is_authenticated and user.groups.filter(name='Vendors').exists()
+    return user.is_authenticated and (user.is_superuser or user.groups.filter(name='Vendors').exists())
+
+
+def is_buyer(user):
+    return user.is_authenticated and user.groups.filter(name='Buyers').exists()
+
+
+def user_stores(user):
+    if not user.is_authenticated:
+        return Store.objects.none()
+    return Store.objects.filter(owner=user)
 
 
 def cart_items_from_session(request):
@@ -28,6 +38,7 @@ def list_products(request):
     return render(request, 'eCommerce/products_list.html', {
         'products': products,
         'is_vendor': is_vendor(request.user),
+        'is_buyer': is_buyer(request.user),
     })
 
 
@@ -51,6 +62,7 @@ def product_detail(request, product_id):
         'product': product,
         'reviews': reviews,
         'is_vendor': is_vendor(request.user),
+        'is_buyer': is_buyer(request.user),
     })
 
 
@@ -59,31 +71,37 @@ def add_product(request):
     if not is_vendor(request.user):
         return render(request, 'eCommerce/add_product.html', {'error': 'Only vendors can add products.'})
 
+    stores = user_stores(request.user)
+    if not stores.exists():
+        return render(request, 'eCommerce/add_product.html', {'error': 'Create a store before adding products.'})
+
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description', '')
         price = request.POST.get('price')
         stock = request.POST.get('stock')
+        store_id = request.POST.get('store_id')
 
-        if not name or not price or not stock:
-            return render(request, 'eCommerce/add_product.html', {'error': 'Name, price, and stock are required.'})
+        if not name or not price or not stock or not store_id:
+            return render(request, 'eCommerce/add_product.html', {'error': 'Name, price, stock, and a store are required.', 'stores': stores})
 
         try:
             price = float(price)
             stock = int(stock)
-        except ValueError:
-            return render(request, 'eCommerce/add_product.html', {'error': 'Price and stock must be valid numbers.'})
+            store = stores.get(pk=store_id)
+        except (ValueError, Store.DoesNotExist):
+            return render(request, 'eCommerce/add_product.html', {'error': 'Price, stock, and store selection must be valid.', 'stores': stores})
 
-        Product.objects.create(vendor=request.user, name=name, description=description, price=price, stock=stock)
+        Product.objects.create(vendor=request.user, store=store, name=name, description=description, price=price, stock=stock)
         return HttpResponseRedirect(reverse('eCommerce:products_list'))
 
-    return render(request, 'eCommerce/add_product.html')
+    return render(request, 'eCommerce/add_product.html', {'stores': stores})
 
 
 @login_required(login_url='/')
 def edit_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    if product.vendor != request.user:
+    if product.vendor != request.user and (product.store is None or product.store.owner != request.user):
         return render(request, 'eCommerce/edit_product.html', {'error': 'You can only edit your own products.', 'product': product})
 
     if request.method == 'POST':
@@ -145,7 +163,7 @@ def change_product_price(request):
 @login_required(login_url='/')
 def delete_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    if product.vendor != request.user:
+    if product.vendor != request.user and (product.store is None or product.store.owner != request.user):
         return render(request, 'eCommerce/confirm_delete.html', {
             'error': 'You can only delete your own products.',
             'product': product,
@@ -272,3 +290,59 @@ def clear_cart(request):
     request.session['cart'] = {}
     request.session.modified = True
     return redirect('eCommerce:main_cart_page')
+
+
+@login_required(login_url='/')
+def list_stores(request):
+    if not is_vendor(request.user):
+        return redirect('grabsomore:welcome')
+    stores = user_stores(request.user)
+    return render(request, 'eCommerce/stores_list.html', {'stores': stores})
+
+
+@login_required(login_url='/')
+def create_store(request):
+    if not is_vendor(request.user):
+        return redirect('grabsomore:welcome')
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        if not name:
+            return render(request, 'eCommerce/store_form.html', {'error': 'Store name is required.'})
+        Store.objects.create(owner=request.user, name=name, description=description)
+        return redirect('eCommerce:stores_list')
+
+    return render(request, 'eCommerce/store_form.html')
+
+
+@login_required(login_url='/')
+def edit_store(request, store_id):
+    if not is_vendor(request.user):
+        return redirect('grabsomore:welcome')
+    store = get_object_or_404(Store, pk=store_id, owner=request.user)
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        if not name:
+            return render(request, 'eCommerce/store_form.html', {'store': store, 'error': 'Store name is required.'})
+        store.name = name
+        store.description = description
+        store.save()
+        return redirect('eCommerce:stores_list')
+
+    return render(request, 'eCommerce/store_form.html', {'store': store})
+
+
+@login_required(login_url='/')
+def delete_store(request, store_id):
+    if not is_vendor(request.user):
+        return redirect('grabsomore:welcome')
+    store = get_object_or_404(Store, pk=store_id, owner=request.user)
+
+    if request.method == 'POST':
+        store.delete()
+        return redirect('eCommerce:stores_list')
+
+    return render(request, 'eCommerce/store_confirm_delete.html', {'store': store})
