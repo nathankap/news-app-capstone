@@ -7,6 +7,7 @@ For more info on settings, see:
 https://docs.djangoproject.com/en/5.2/topics/settings/
 """
 
+import os
 from pathlib import Path
 
 # This sets the base directory of your project so you can refer to files easily
@@ -25,7 +26,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',        # Admin site
     'django.contrib.auth',         # User authentication system
-    'django.contrib.contenttypes', # Content type framework
+    'django.contrib.contenttypes',  # Content type framework
     'django.contrib.sessions',     # Session framework
     'django.contrib.messages',     # Message framework
     'django.contrib.staticfiles',  # Manage static files like CSS and JS
@@ -33,31 +34,37 @@ INSTALLED_APPS = [
     'eCommerce',                  # Your custom app for eCommerce
 ]
 
-# Middleware are layers that process requests/responses, like security and session management
+# Middleware are layers that process requests/responses, like security and
+# session management
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware', 
-    'django.middleware.csrf.CsrfViewMiddleware', # Protects against CSRF attacks
-    'django.contrib.auth.middleware.AuthenticationMiddleware', # Adds user info to requests
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # Protects against CSRF attacks
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Adds user info to requests
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware', # Prevents clickjacking attacks
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Prevents clickjacking attacks
 ]
 
 # Root URL configuration points to the main urls.py
 ROOT_URLCONF = 'AuthLog.urls'
 
-# Templates settings to tell Django where your HTML files are and how to process them
+# Templates settings to tell Django where your HTML files are and how to
+# process them
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],  # You can add folders here if you keep templates outside apps
-        'APP_DIRS': True, # Tells Django to look for templates inside each app’s 'templates' folder
+        'APP_DIRS': True,  # Tells Django to look for templates inside each app’s 'templates' folder
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request', # Adds 'request' object to templates
-                'django.contrib.auth.context_processors.auth', # Adds user info to templates
-                'django.contrib.messages.context_processors.messages', # Add message framework to templates
+                # Adds 'request' object to templates
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',  # Adds user info to templates
+                # Add message framework to templates
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -66,8 +73,8 @@ TEMPLATES = [
 # WSGI application: Entry point for WSGI-compatible web servers
 WSGI_APPLICATION = 'AuthLog.wsgi.application'
 
-# Database settings: Use a relational database engine with SQLite for local development.
-import os
+# Database settings: Use a relational database engine with SQLite for
+# local development.
 
 # Database configuration: prefer MariaDB when environment variables are provided.
 # For local development without MariaDB, you can still use SQLite by omitting
@@ -97,10 +104,10 @@ else:
 
 # Password validation helps make sure passwords are strong and safe
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 # Internationalization settings (language and timezone)
@@ -116,7 +123,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings: use the console backend for development and demonstration.
-# Replace with a real SMTP backend when you want to send actual email from a configured account.
+# Replace with a real SMTP backend when you want to send actual email from
+# a configured account.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = 'no-reply@authlog.local'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
@@ -125,4 +133,3 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your_email@gmail.com'
 EMAIL_HOST_PASSWORD = 'your_app_password'
-

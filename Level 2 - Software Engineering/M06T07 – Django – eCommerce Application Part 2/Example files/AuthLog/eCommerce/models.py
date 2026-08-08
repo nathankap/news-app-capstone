@@ -40,7 +40,8 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        owner = self.store.owner.username if self.store and self.store.owner else (self.vendor.username if self.vendor else 'unknown')
+        owner = self.store.owner.username if self.store and self.store.owner else (
+            self.vendor.username if self.vendor else 'unknown')
         return f"{self.name} ({owner})"
 
     class Meta:
@@ -54,9 +55,13 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='orders')
     created_at = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_price = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0)
     email_sent = models.BooleanField(default=False)
 
     def __str__(self):
@@ -64,7 +69,10 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -74,8 +82,14 @@ class OrderItem(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='reviews')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews')
     rating = models.PositiveSmallIntegerField(default=5)
     comment = models.TextField(blank=True)
     verified = models.BooleanField(default=False)
@@ -86,5 +100,6 @@ class Review(models.Model):
 
     def save(self, *args, **kwargs):
         if self.user and self.product:
-            self.verified = self.user.orders.filter(items__product=self.product).exists()
+            self.verified = self.user.orders.filter(
+                items__product=self.product).exists()
         super().save(*args, **kwargs)

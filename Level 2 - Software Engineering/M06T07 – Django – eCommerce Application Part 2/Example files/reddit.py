@@ -3,7 +3,6 @@ import requests
 
 def get_reddit_posts(subreddit="python"):
     # Build the URL for the subreddit's JSON feed
-
     """
     Fetch posts from a given subreddit.
 
@@ -20,7 +19,7 @@ def get_reddit_posts(subreddit="python"):
     """
 
     url = f"https://www.reddit.com/r/{subreddit}/.json"
-    headers = {"User-Agent": "DjangoEcommerceApp/1.0"}  # Required by Reddit
+    headers = {"User-Agent": "DjangoEcommerceApp/1.0"}
 
     # Make the request
     response = requests.get(url, headers=headers)

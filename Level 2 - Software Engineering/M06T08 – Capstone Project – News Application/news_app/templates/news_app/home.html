@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>News App</h1>
+    <p>Minimal news application scaffold.</p>
+
+    <h2>Approved Articles</h2>
+    {% if articles %}
+        <ul>
+            {% for article in articles %}
+                <li><strong>{{ article.title }}</strong> — {{ article.content }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No approved articles yet.</p>
+    {% endif %}
+
+    <h2>Newsletters</h2>
+    {% if newsletters %}
+        <ul>
+            {% for newsletter in newsletters %}
+                <li><strong>{{ newsletter.title }}</strong> — {{ newsletter.description }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No newsletters yet.</p>
+    {% endif %}
+</body>
+</html>

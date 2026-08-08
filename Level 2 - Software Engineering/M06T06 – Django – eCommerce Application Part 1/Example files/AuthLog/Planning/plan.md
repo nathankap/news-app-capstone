@@ -47,5 +47,16 @@ Small eCommerce web app with two main user roles: Vendors and Buyers. Vendors cr
 1. Add `Store` model and migrate `Product` to belong to `Store` (update relationships and migrations).
 2. Implement Store CRUD views and templates.
 
+## Part 2 – REST API Planning
+A separate planning note has been added in `Planning/api_plan.md` for the API extension work.
+
+It covers:
+- the API goal and scope
+- the main resources to expose
+- suggested endpoints for stores, products, and reviews
+- authentication and permission expectations
+
+The next planned step is to turn this into a sequence diagram before implementation begins.
+
 Placeholders and notes:
 - Keep planning concise; expand diagrams/screenshots locally if desired.

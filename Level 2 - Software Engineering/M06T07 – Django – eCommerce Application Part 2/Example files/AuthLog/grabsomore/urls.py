@@ -20,12 +20,19 @@ urlpatterns = [
     path('alter_login/', views.login_user, name='alterlogin'),
 
     # Page where users request a password reset by entering their email
-    path('request-password-reset/', views.send_password_reset, name='request_password_reset'),
+    path(
+        'request-password-reset/',
+        views.send_password_reset,
+        name='request_password_reset'),
 
     # Page users visit from the email link to enter a new password
     # The token in the URL is used to verify the password reset request
-    path('reset/<str:token>/', views.reset_user_password, name='password_reset_form'),
+    path(
+        'reset/<str:token>/',
+        views.reset_user_password,
+        name='password_reset_form'),
 
-    # Handles the form submission to actually change the password (POST request)
+    # Handles the form submission to actually change the password (POST
+    # request)
     path('reset_password/', views.reset_password, name='reset_password'),
 ]

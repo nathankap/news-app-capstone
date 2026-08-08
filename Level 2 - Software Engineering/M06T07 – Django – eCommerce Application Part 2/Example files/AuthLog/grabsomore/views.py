@@ -22,7 +22,8 @@ def ensure_group(name):
 def add_permissions_to_user(user, permission_codenames):
     for codename in permission_codenames:
         try:
-            permission = Permission.objects.get(codename=codename, content_type__app_label='eCommerce')
+            permission = Permission.objects.get(
+                codename=codename, content_type__app_label='eCommerce')
             user.user_permissions.add(permission)
         except Permission.DoesNotExist:
             pass
@@ -47,11 +48,13 @@ def login_user(request):
 
             request.session['user_id'] = user.id
             request.session['username'] = user.username
-            request.session['user_role'] = 'vendor' if user.groups.filter(name='Vendors').exists() else 'buyer'
+            request.session['user_role'] = 'vendor' if user.groups.filter(
+                name='Vendors').exists() else 'buyer'
 
             return HttpResponseRedirect(reverse('grabsomore:welcome'))
         else:
-            return render(request, 'grabsomore/login.html', {'error': 'Invalid credentials'})
+            return render(request, 'grabsomore/login.html',
+                          {'error': 'Invalid credentials'})
 
     return render(request, 'grabsomore/login.html')
 
@@ -65,17 +68,22 @@ def register_user(request):
         role = request.POST.get('role', 'buyer')
 
         if not username or not password or not email:
-            return render(request, 'grabsomore/register.html', {'error': 'All fields are required.'})
+            return render(request, 'grabsomore/register.html',
+                          {'error': 'All fields are required.'})
 
         try:
-            user = User.objects.create_user(username=username, password=password, email=email)
+            user = User.objects.create_user(
+                username=username, password=password, email=email)
         except IntegrityError:
-            return render(request, 'grabsomore/register.html', {'error': 'That username is already taken.'})
+            return render(request, 'grabsomore/register.html',
+                          {'error': 'That username is already taken.'})
 
         if role == 'vendor':
             vendors_group = ensure_group('Vendors')
             user.groups.add(vendors_group)
-            add_permissions_to_user(user, ['add_products', 'change_products', 'delete_products', 'view_products'])
+            add_permissions_to_user(
+                user, [
+                    'add_products', 'change_products', 'delete_products', 'view_products'])
         else:
             buyers_group = ensure_group('Buyers')
             user.groups.add(buyers_group)
@@ -114,7 +122,10 @@ def welcome(request):
 def build_email(user, reset_url):
     subject = 'Password Reset'
     body = f'Hi {user.username},\n\nUse the link below to reset your password:\n{reset_url}\n\nIf you did not request a password reset, you can ignore this message.'
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@authlog.local')
+    from_email = getattr(
+        settings,
+        'DEFAULT_FROM_EMAIL',
+        'no-reply@authlog.local')
     email = EmailMessage(subject, body, from_email, [user.email])
     return email
 
@@ -125,8 +136,14 @@ def generate_reset_url(request, user):
     expiry_date = timezone.now() + timedelta(minutes=15)
     hashed_token = sha1(token.encode()).hexdigest()
 
-    ResetToken.objects.create(user=user, token=hashed_token, expiry_date=expiry_date)
-    reset_url = reverse('grabsomore:password_reset_form', kwargs={'token': token})
+    ResetToken.objects.create(
+        user=user,
+        token=hashed_token,
+        expiry_date=expiry_date)
+    reset_url = reverse(
+        'grabsomore:password_reset_form',
+        kwargs={
+            'token': token})
     return request.build_absolute_uri(reset_url)
 
 
@@ -139,9 +156,13 @@ def send_password_reset(request):
             reset_url = generate_reset_url(request, user)
             email = build_email(user, reset_url)
             email.send()
-            return render(request, 'grabsomore/reset_email_sent.html', {'email': user_email})
+            return render(request,
+                          'grabsomore/reset_email_sent.html',
+                          {'email': user_email})
         except User.DoesNotExist:
-            return render(request, 'grabsomore/reset_email_sent.html', {'email': user_email})
+            return render(request,
+                          'grabsomore/reset_email_sent.html',
+                          {'email': user_email})
 
     return render(request, 'grabsomore/request_password_reset.html')
 
@@ -154,9 +175,13 @@ def reset_user_password(request, token):
         if user_token.expiry_date < timezone.now():
             user_token.delete()
             return render(request, 'grabsomore/password_reset_expired.html')
-        return render(request, 'grabsomore/password_reset.html', {'token': token})
+        return render(request,
+                      'grabsomore/password_reset.html',
+                      {'token': token})
     except ResetToken.DoesNotExist:
-        return render(request, 'grabsomore/password_reset_invalid.html', {'message': 'The reset link is invalid or expired.'})
+        return render(request,
+                      'grabsomore/password_reset_invalid.html',
+                      {'message': 'The reset link is invalid or expired.'})
 
 
 # Handles the password reset form submission (when user enters new password)
@@ -180,10 +205,12 @@ def reset_password(request):
 
         hashed_token = sha1(token.encode()).hexdigest()
         try:
-            reset_token = ResetToken.objects.get(token=hashed_token, used=False)
+            reset_token = ResetToken.objects.get(
+                token=hashed_token, used=False)
             if reset_token.expiry_date < timezone.now():
                 reset_token.delete()
-                return render(request, 'grabsomore/password_reset_expired.html')
+                return render(
+                    request, 'grabsomore/password_reset_expired.html')
 
             user = reset_token.user
             user.set_password(password)
@@ -194,6 +221,7 @@ def reset_password(request):
 
             return HttpResponseRedirect(reverse('grabsomore:login'))
         except ResetToken.DoesNotExist:
-            return render(request, 'grabsomore/password_reset_invalid.html', {'message': 'The reset token is invalid or has already been used.'})
+            return render(request, 'grabsomore/password_reset_invalid.html',
+                          {'message': 'The reset token is invalid or has already been used.'})
 
     return HttpResponseRedirect(reverse('grabsomore:login'))
