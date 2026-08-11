@@ -74,5 +74,9 @@ def note_delete(request, pk):
     :return: Redirect to the note list after deletion.
     """
     note = get_object_or_404(Note, pk=pk)
-    note.delete()
-    return redirect("note_list")
+
+    if request.method == "POST":
+        note.delete()
+        return redirect("note_list")
+
+    return render(request, "notes/note_delete_confirm.html", {"note": note})

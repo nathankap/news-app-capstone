@@ -63,7 +63,12 @@ class NoteViewTest(TestCase):
         self.assertEqual(self.note.title, 'Updated Note')
         self.assertEqual(self.note.content, 'Updated content.')
 
-    def test_note_delete_view(self):
+    def test_note_delete_requires_post(self):
         response = self.client.get(reverse('note_delete', args=[self.note.pk]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Note.objects.filter(pk=self.note.pk).exists())
+
+    def test_note_delete_view(self):
+        response = self.client.post(reverse('note_delete', args=[self.note.pk]), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Note.objects.filter(pk=self.note.pk).exists())
