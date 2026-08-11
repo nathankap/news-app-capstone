@@ -1,8 +1,8 @@
 """
-URL configuration for bulletin_board project.
+URL configuration for news_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+    https://docs.djangoproject.com/en/5.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -15,13 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path, include
+from rest_framework.authtoken.views import obtain_auth_token
 
-# Define URL patterns for the entire project
 urlpatterns = [
-    # Admin URL pattern, mapping to the Django admin interface
-    path("admin/", admin.site.urls),
-    # Include URL patterns from the 'notes' app
-    path("", include("notes.urls")),
+    path('admin/', admin.site.urls),
+    path('api/token/', obtain_auth_token, name='api_token'),
+    path('', include('news_app.urls')),
 ]
-

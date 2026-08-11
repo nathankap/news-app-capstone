@@ -1,1 +1,1 @@
-https://github.com/your-username/your-sticky-notes-repo
+https://github.com/nathankap/sticky-notes-django

@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'posts',
+    'notes',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +131,7 @@ STATIC_URL = 'static/'
 
 # Add static files directories
 STATICFILES_DIRS = [
-    BASE_DIR / "posts" / "static",
+    BASE_DIR / "notes" / "static",
 ]
 
 # Define the root directory for static
