@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Delete Store</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Delete Store{% endblock %}
+
+{% block content %}
+<div class="card">
     <h1>Delete Store</h1>
     <p>Are you sure you want to delete the store <strong>{{ store.name }}</strong>?</p>
     <form method="POST">
         {% csrf_token %}
-        <button type="submit">Yes, delete it</button>
+        <button type="submit" class="button-danger">Yes, delete it</button>
     </form>
-    <br>
-    <a href="{% url 'eCommerce:stores_list' %}"><button>Cancel</button></a>
-</body>
-</html>
+    <div class="actions">
+        <a href="{% url 'eCommerce:stores_list' %}"><button class="button-muted">Cancel</button></a>
+    </div>
+</div>
+{% endblock %}

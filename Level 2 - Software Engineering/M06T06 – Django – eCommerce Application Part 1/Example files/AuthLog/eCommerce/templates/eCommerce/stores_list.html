@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Stores</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}My Stores{% endblock %}
+
+{% block content %}
+<div class="card">
     <h1>My Stores</h1>
-    <a href="{% url 'eCommerce:create_store' %}"><button>Create Store</button></a>
-    <hr>
+    <div class="actions">
+        <a href="{% url 'eCommerce:create_store' %}"><button>Create Store</button></a>
+    </div>
     {% if stores %}
         <ul>
             {% for store in stores %}
@@ -22,7 +22,8 @@
     {% else %}
         <p>You have not created any stores yet.</p>
     {% endif %}
-    <br>
-    <a href="{% url 'eCommerce:products_list' %}"><button>Back to Catalog</button></a>
-</body>
-</html>
+    <div class="actions">
+        <a href="{% url 'eCommerce:products_list' %}"><button class="button-muted">Back to Catalog</button></a>
+    </div>
+</div>
+{% endblock %}

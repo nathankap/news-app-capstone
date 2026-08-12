@@ -15,11 +15,13 @@ from .models import ResetToken
 
 
 def ensure_group(name):
+    """Get or create a Django auth group by name."""
     group, _ = Group.objects.get_or_create(name=name)
     return group
 
 
 def add_permissions_to_user(user, permission_codenames):
+    """Attach app-specific permissions to a user when they exist."""
     for codename in permission_codenames:
         try:
             permission = Permission.objects.get(codename=codename, content_type__app_label='eCommerce')
@@ -28,8 +30,8 @@ def add_permissions_to_user(user, permission_codenames):
             pass
 
 
-# This function handles user login
 def login_user(request):
+    """Authenticate a user and start a role-aware session."""
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -56,16 +58,19 @@ def login_user(request):
     return render(request, 'grabsomore/login.html')
 
 
-# This function handles user registration (signing up)
 def register_user(request):
+    """Register a new buyer or vendor user account."""
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('username', '').strip()
         password = request.POST.get('password')
-        email = request.POST.get('email')
+        email = request.POST.get('email', '').strip().lower()
         role = request.POST.get('role', 'buyer')
 
         if not username or not password or not email:
             return render(request, 'grabsomore/register.html', {'error': 'All fields are required.'})
+
+        if User.objects.filter(email__iexact=email).exists():
+            return render(request, 'grabsomore/register.html', {'error': 'That email is already registered.'})
 
         try:
             user = User.objects.create_user(username=username, password=password, email=email)
@@ -90,28 +95,28 @@ def register_user(request):
     return render(request, 'grabsomore/register.html')
 
 
-# Helper function to change a user's password securely
 def change_user_password(username, new_password):
+    """Set a new password for the specified username."""
     user = User.objects.get(username=username)
     user.set_password(new_password)
     user.save()
 
 
-# Logs the user out and redirects to login page
 def logout_user(request):
+    """Log out the current user and redirect to login."""
     if request.user is not None:
         logout(request)
     return HttpResponseRedirect(reverse('grabsomore:login'))
 
 
-# Only logged-in users can see the welcome page
 @login_required(login_url=reverse_lazy('grabsomore:login'))
 def welcome(request):
+    """Render the post-login welcome page."""
     return render(request, 'grabsomore/welcome.html')
 
 
-# Creates the email object to send for password reset
 def build_email(user, reset_url):
+    """Build a password reset email message object."""
     subject = 'Password Reset'
     body = f'Hi {user.username},\n\nUse the link below to reset your password:\n{reset_url}\n\nIf you did not request a password reset, you can ignore this message.'
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@authlog.local')
@@ -119,8 +124,8 @@ def build_email(user, reset_url):
     return email
 
 
-# Creates a secure reset URL with a token that expires in 15 minutes
 def generate_reset_url(request, user):
+    """Create and store a time-limited password reset URL."""
     token = secrets.token_urlsafe(24)
     expiry_date = timezone.now() + timedelta(minutes=15)
     hashed_token = sha1(token.encode()).hexdigest()
@@ -130,8 +135,8 @@ def generate_reset_url(request, user):
     return request.build_absolute_uri(reset_url)
 
 
-# Handles sending the password reset email after user submits their email
 def send_password_reset(request):
+    """Handle password reset requests without revealing account existence."""
     if request.method == 'POST':
         user_email = request.POST.get('email')
         try:
@@ -146,8 +151,8 @@ def send_password_reset(request):
     return render(request, 'grabsomore/request_password_reset.html')
 
 
-# This view is called when user clicks the reset link in their email
 def reset_user_password(request, token):
+    """Validate a reset token and show the reset form."""
     hashed_token = sha1(token.encode()).hexdigest()
     try:
         user_token = ResetToken.objects.get(token=hashed_token, used=False)
@@ -159,8 +164,8 @@ def reset_user_password(request, token):
         return render(request, 'grabsomore/password_reset_invalid.html', {'message': 'The reset link is invalid or expired.'})
 
 
-# Handles the password reset form submission (when user enters new password)
 def reset_password(request):
+    """Validate and apply a new password for a valid reset token."""
     if request.method == 'POST':
         token = request.POST.get('token')
         password = request.POST.get('password')

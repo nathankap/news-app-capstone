@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Delete Product</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Delete Product{% endblock %}
+
+{% block content %}
+<div class="card">
     <h1>Delete Product</h1>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p class="error">{{ error }}</p>
     {% endif %}
 
     <p>Are you sure you want to delete <strong>{{ product.name }}</strong>?</p>
@@ -18,7 +17,8 @@
         <button type="submit">Yes, delete</button>
     </form>
 
-    <br>
-    <a href="{% url 'eCommerce:product_detail' product.id %}"><button>No, go back</button></a>
-</body>
-</html>
+    <div class="actions">
+        <a href="{% url 'eCommerce:product_detail' product.id %}"><button class="button-muted">No, go back</button></a>
+    </div>
+</div>
+{% endblock %}

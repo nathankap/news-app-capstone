@@ -1,7 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Change Price{% endblock %}
+
+{% block content %}
+<div class="card">
 <h2>Change Product Price</h2>
 
 {% if error %}
-    <p style="color:red;">{{ error }}</p>
+    <p class="error">{{ error }}</p>
 {% endif %}
 
 <form method="POST">
@@ -15,17 +21,14 @@
     <button type="submit">Update Price</button>
 </form>
 
-<!-- Navigation Buttons -->
-<div style="margin-top: 20px;">
+<div class="actions">
     <a href="{% url 'eCommerce:products_list' %}">
-        <button>🏪 Back to Catalog</button>
+        <button class="button-muted">Back to Catalog</button>
     </a>
 
     <a href="{% url 'eCommerce:product_page' %}">
-        <button>🔍 Search Product</button>
-    </a>
-
-    <a href="{% url 'eCommerce:main_cart_page' %}">
-        <button>🛒 View Cart</button>
+        <button class="button-muted">Search Product</button>
     </a>
 </div>
+</div>
+{% endblock %}

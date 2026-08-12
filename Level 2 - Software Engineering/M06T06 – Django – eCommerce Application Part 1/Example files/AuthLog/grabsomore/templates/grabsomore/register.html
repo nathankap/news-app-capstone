@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="card">
     <h2>Register An Account</h2>
 
     <form method="POST" action="{% url 'grabsomore:register' %}">
@@ -28,9 +28,9 @@
     </form>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p class="error">{{ error }}</p>
     {% endif %}
 
     <p>Already have an account? <a href="{% url 'grabsomore:login' %}">Login here</a></p>
-</body>
-</html>
+</div>
+{% endblock %}

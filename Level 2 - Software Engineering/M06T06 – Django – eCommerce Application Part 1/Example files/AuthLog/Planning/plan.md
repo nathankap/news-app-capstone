@@ -43,6 +43,18 @@ Small eCommerce web app with two main user roles: Vendors and Buyers. Vendors cr
 - Partial failures: use atomic transactions to rollback on error.
 - Data validation: validate user input in forms and models.
 
+## Requirements Traceability Checklist
+- User roles: buyer/vendor login and role-based navigation and view access.
+- Vendor flows: store CRUD and product CRUD scoped to owned stores/products.
+- Buyer flows: browse products, session-backed cart, checkout, invoice email, reviews.
+- Session cart: cart persisted in Django session while browsing.
+- Checkout completion: creates order + order items, decrements stock, clears cart.
+- Review verification: review marked verified when product exists in purchase history.
+- Password reset: email reset URL with expiring token and single-use protection.
+- Relational database: project supports MariaDB/MySQL configuration and migrations.
+- Permission controls: template visibility + server-side authorization checks.
+- Failure handling: input validation, expired token handling, missing stock checks.
+
 ## Next small step (recommended)
 1. Add `Store` model and migrate `Product` to belong to `Store` (update relationships and migrations).
 2. Implement Store CRUD views and templates.

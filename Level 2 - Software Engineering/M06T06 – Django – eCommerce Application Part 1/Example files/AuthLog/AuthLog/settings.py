@@ -51,7 +51,7 @@ ROOT_URLCONF = 'AuthLog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # You can add folders here if you keep templates outside apps
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True, # Tells Django to look for templates inside each app’s 'templates' folder
         'OPTIONS': {
             'context_processors': [
@@ -111,6 +111,7 @@ USE_TZ = True            # Use timezone-aware datetimes
 
 # Static files (CSS, JavaScript, images) URL prefix
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Default primary key type for models
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

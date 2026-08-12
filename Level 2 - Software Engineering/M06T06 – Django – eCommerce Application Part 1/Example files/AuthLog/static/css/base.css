@@ -1,0 +1,144 @@
+:root {
+    --bg-1: #f6f7fb;
+    --bg-2: #eef2ff;
+    --panel: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --line: #d1d5db;
+    --brand: #0f766e;
+    --brand-2: #0ea5e9;
+    --danger: #b91c1c;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at top right, var(--bg-2), var(--bg-1) 42%);
+}
+
+.container {
+    width: min(980px, 92vw);
+    margin: 0 auto;
+}
+
+.site-header {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, #e6fffb, #f0f9ff);
+}
+
+.site-title {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.site-subtitle {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+}
+
+h1, h2 {
+    margin-top: 0;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+button,
+.button-link {
+    border: 1px solid #0f766e;
+    background: #0f766e;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.45rem 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover,
+.button-link:hover {
+    background: #115e59;
+}
+
+.button-muted {
+    border-color: var(--line);
+    background: #f9fafb;
+    color: var(--text);
+}
+
+.button-danger {
+    border-color: var(--danger);
+    background: var(--danger);
+}
+
+form {
+    margin: 0.5rem 0;
+}
+
+label {
+    display: block;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+}
+
+th,
+td {
+    border: 1px solid var(--line);
+    padding: 0.6rem;
+    text-align: left;
+}
+
+th {
+    background: #ecfeff;
+}
+
+.error {
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.5rem 0.65rem;
+}
+
+.inline {
+    display: inline-flex;
+    margin: 0;
+    align-items: center;
+}

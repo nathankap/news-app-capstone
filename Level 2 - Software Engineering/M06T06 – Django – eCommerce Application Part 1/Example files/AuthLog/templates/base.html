@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AuthLog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title">AuthLog eCommerce</h1>
+            {% if request.user.is_authenticated %}
+                <p class="site-subtitle">Signed in as {{ request.user.username }}</p>
+            {% else %}
+                <p class="site-subtitle">Sign in to continue</p>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

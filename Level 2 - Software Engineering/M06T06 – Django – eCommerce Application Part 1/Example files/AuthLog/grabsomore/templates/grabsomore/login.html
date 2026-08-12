@@ -1,44 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="card">
     <h2>Login</h2>
 
-    <!-- This form sends login info to the backend using POST -->
     <form method="POST" action="{% url 'grabsomore:login' %}">
-        {% csrf_token %}  <!-- Security token to prevent hacking -->
-
-        <!-- Username input -->
+        {% csrf_token %}
         <label for="username">Username:</label>
         <input type="text" name="username" required><br><br>
 
-        <!-- Password input -->
         <label for="password">Password:</label>
         <input type="password" name="password" required><br><br>
 
-        <!-- Submit button -->
         <button type="submit">Login</button>
     </form>
 
-    <!-- If there's an error (like wrong password), show it -->
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p class="error">{{ error }}</p>
     {% endif %}
 
-    <!-- Link to reset password page -->
-    <p style="margin-top: 10px;">
-        <a href="{% url 'grabsomore:request_password_reset' %}">Forgot your password?</a>
-    </p>
-
-    <!-- Link to registration page -->
-    <div style="margin-top: 20px;">
+    <div class="actions">
+        <a href="{% url 'grabsomore:request_password_reset' %}" class="button-link button-muted">Forgot your password?</a>
         <p>Don't have an account?
             <a href="{% url 'grabsomore:register' %}">
                 <button>Register here</button>
             </a>
         </p>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

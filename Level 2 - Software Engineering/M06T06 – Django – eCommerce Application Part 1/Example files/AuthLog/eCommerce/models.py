@@ -4,6 +4,8 @@ from django.utils import timezone
 
 
 class Store(models.Model):
+    """Represents a vendor-owned store in the marketplace."""
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -14,10 +16,13 @@ class Store(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        """Return a readable store label for admin and debug views."""
         return f"{self.name} ({self.owner.username})"
 
 
 class Product(models.Model):
+    """Represents a product that belongs to a vendor and store."""
+
     vendor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -40,6 +45,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
+        """Return a readable product label with owner information."""
         owner = self.store.owner.username if self.store and self.store.owner else (self.vendor.username if self.vendor else 'unknown')
         return f"{self.name} ({owner})"
 
@@ -54,26 +60,34 @@ class Product(models.Model):
 
 
 class Order(models.Model):
+    """Represents a buyer checkout order and its invoice state."""
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     created_at = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     email_sent = models.BooleanField(default=False)
 
     def __str__(self):
+        """Return a readable order label."""
         return f"Order #{self.pk} for {self.user.username}"
 
 
 class OrderItem(models.Model):
+    """Represents a line item in an order."""
+
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
+        """Return a readable order item label."""
         return f"{self.quantity} x {self.product.name}"
 
 
 class Review(models.Model):
+    """Represents a buyer review for a product."""
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveSmallIntegerField(default=5)
@@ -85,6 +99,7 @@ class Review(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
+        """Set verification flag based on purchase history before save."""
         if self.user and self.product:
             self.verified = self.user.orders.filter(items__product=self.product).exists()
         super().save(*args, **kwargs)

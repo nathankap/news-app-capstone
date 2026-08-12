@@ -1,3 +1,7 @@
-import pymysql
+try:
+	import pymysql
+except ModuleNotFoundError:
+	pymysql = None
 
-pymysql.install_as_MySQLdb()
+if pymysql is not None:
+	pymysql.install_as_MySQLdb()

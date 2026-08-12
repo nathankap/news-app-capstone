@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% if store %}Edit Store{% else %}Create Store{% endif %}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}{% if store %}Edit Store{% else %}Create Store{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
     <h1>{% if store %}Edit Store{% else %}Create Store{% endif %}</h1>
-    {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
     <form method="POST">
         {% csrf_token %}
         <label>Name:</label><br>
@@ -15,7 +14,8 @@
         <textarea name="description" rows="4" cols="40">{{ store.description|default_if_none:'' }}</textarea><br><br>
         <button type="submit">Save</button>
     </form>
-    <br>
-    <a href="{% url 'eCommerce:stores_list' %}"><button>Back to Stores</button></a>
-</body>
-</html>
+    <div class="actions">
+        <a href="{% url 'eCommerce:stores_list' %}"><button class="button-muted">Back to Stores</button></a>
+    </div>
+</div>
+{% endblock %}
