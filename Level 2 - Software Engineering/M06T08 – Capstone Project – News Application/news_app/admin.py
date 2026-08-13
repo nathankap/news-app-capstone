@@ -5,8 +5,8 @@ from .models import Article, CustomUser, Newsletter, Publisher
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'role', 'is_staff', 'is_active')
-    list_filter = ('role', 'is_staff', 'is_active')
+    list_display = ('username', 'role', 'role_approved', 'is_staff', 'is_active')
+    list_filter = ('role', 'role_approved', 'is_staff', 'is_active')
 
 
 @admin.register(Publisher)

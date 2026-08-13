@@ -19,8 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_NAME = os.environ.get('DB_NAME', '')
 DB_USER = os.environ.get('DB_USER', '')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
-DB_HOST = os.environ.get('DB_HOST', 'localhost')
-DB_PORT = os.environ.get('DB_PORT', '3306')
+DB_HOST = os.environ.get('DB_HOST', '')
+DB_PORT = os.environ.get('DB_PORT', '')
 
 # MariaDB is the expected database for this project.
 # Set DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, and DB_PORT to use it.
@@ -67,7 +67,7 @@ ROOT_URLCONF = 'news_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,10 +89,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql' if DB_NAME else 'django.db.backends.sqlite3',  # noqa: E501
         'NAME': DB_NAME if DB_NAME else str(BASE_DIR / 'db.sqlite3'),
-        'USER': DB_USER if DB_NAME else '',
-        'PASSWORD': DB_PASSWORD if DB_NAME else '',
-        'HOST': DB_HOST if DB_NAME else '',
-        'PORT': DB_PORT if DB_NAME else '',
+        'USER': DB_USER if DB_USER else '',
+        'PASSWORD': DB_PASSWORD if DB_PASSWORD else '',
+        'HOST': DB_HOST if DB_HOST else '',
+        'PORT': DB_PORT if DB_PORT else '',
     }
 }
 
@@ -132,6 +132,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -146,3 +147,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'no-reply@news-app.local'

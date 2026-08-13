@@ -1,33 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
-</head>
-<body>
-    <h1>News App</h1>
-    <p>Minimal news application scaffold.</p>
+{% extends 'news_app/base.html' %}
 
-    <h2>Approved Articles</h2>
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>Articles</h2>
+    <p class="section-note">Read articles from our journalists and publisher teams.</p>
     {% if articles %}
-        <ul>
+        <ul class="stack-list">
             {% for article in articles %}
-                <li><strong>{{ article.title }}</strong> — {{ article.content }}</li>
+                <li>
+                    <a class="link-title" href="{% url 'article_page' article.id %}">{{ article.title }}</a><br>
+                    <small>By {{ article.author.username }}{% if article.publisher %} | {{ article.publisher.name }}{% endif %}</small>
+                    <p class="summary">{{ article.content|truncatechars:160 }}</p>
+                </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>No approved articles yet.</p>
+        <p>No articles yet.</p>
     {% endif %}
+</section>
 
+<section class="card">
     <h2>Newsletters</h2>
+    <p class="section-note">Read curated compilations of related articles from our contributors.</p>
     {% if newsletters %}
-        <ul>
+        <ul class="stack-list">
             {% for newsletter in newsletters %}
-                <li><strong>{{ newsletter.title }}</strong> — {{ newsletter.description }}</li>
+                <li>
+                    <a class="link-title" href="{% url 'newsletter_page' newsletter.id %}">{{ newsletter.title }}</a><br>
+                    <small>By {{ newsletter.author.username }}</small>
+                    <p class="summary">{{ newsletter.description|default:'No description yet.'|truncatechars:140 }}</p>
+                </li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No newsletters yet.</p>
     {% endif %}
-</body>
-</html>
+</section>
+{% endblock %}

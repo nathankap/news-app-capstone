@@ -1,0 +1,29 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}{{ newsletter.title }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>{{ newsletter.title }}</h2>
+    <p class="meta">By {{ newsletter.author.username }} | {{ newsletter.created_at }}</p>
+    <p>{{ newsletter.description|default:'No description yet.' }}</p>
+
+    <h3>Articles in this newsletter</h3>
+    {% if newsletter.articles.all %}
+        <ul class="stack-list">
+            {% for article in newsletter.articles.all %}
+                <li>
+                    <a class="link-title" href="{% url 'article_page' article.id %}">{{ article.title }}</a>
+                    <p class="summary">{{ article.content|truncatechars:140 }}</p>
+                </li>
+            {% empty %}
+                <li>No articles in this newsletter yet.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="actions">
+        <a class="button" href="{% url 'home' %}">Back Home</a>
+    </div>
+</section>
+{% endblock %}

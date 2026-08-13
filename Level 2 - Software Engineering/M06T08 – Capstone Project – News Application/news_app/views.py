@@ -1,29 +1,345 @@
 import requests
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.mail import send_mail
 from django.db.models import Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.decorators.http import require_POST
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Article, Newsletter
+from .forms import (
+    ArticleForm,
+    CustomAuthenticationForm,
+    NewsletterForm,
+    RegisterForm,
+    SubscriptionForm,
+)
+from .models import Article, CustomUser, Newsletter, Publisher
 from .serializers import ArticleSerializer, NewsletterSerializer
 
 
 def home(request):
+    """Render the homepage with approved articles and recent newsletters."""
     articles = Article.objects.filter(
-        approved=True).order_by('-created_at')[:5]
-    newsletters = Newsletter.objects.order_by('-created_at')[:5]
+        approved=True
+    ).order_by('-created_at')[:8]
+    newsletters = Newsletter.objects.order_by('-created_at')[:8]
+    is_editor = _user_is_editor(request.user)
     return render(request, 'news_app/home.html', {
         'title': 'News App',
         'articles': articles,
         'newsletters': newsletters,
+        'is_editor': is_editor,
+        'is_journalist': _user_is_journalist(request.user),
     })
 
 
-def _notify_approval(article):
+def register_view(request):
+    """Register a new user account from the website."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            if user.role in {'editor', 'journalist'}:
+                user.role_approved = False
+                user.save(update_fields=['role_approved'])
+                messages.info(
+                    request,
+                    (
+                        'Account created. Your role must be approved by '
+                        'an editor or admin.'
+                    ),
+                )
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = RegisterForm()
+
+    return render(request, 'news_app/auth_form.html', {
+        'title': 'Create Account',
+        'form': form,
+        'submit_label': 'Register',
+    })
+
+
+def login_view(request):
+    """Authenticate a user from the website login page."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect('dashboard')
+    else:
+        form = CustomAuthenticationForm(request)
+
+    return render(request, 'news_app/auth_form.html', {
+        'title': 'Login',
+        'form': form,
+        'submit_label': 'Login',
+    })
+
+
+@login_required
+def logout_view(request):
+    """Log out current user and return to home."""
+    logout(request)
+    return redirect('home')
+
+
+@login_required
+def dashboard_view(request):
+    """Render role-aware dashboard actions and user content."""
+    user = request.user
+    role_pending = (
+        user.role in {'editor', 'journalist'}
+        and not getattr(user, 'role_approved', True)
+    )
+    context = {
+        'pending_articles': Article.objects.filter(approved=False).order_by(
+            '-created_at'
+        )[:10] if _user_is_editor(user) else [],
+        'my_articles': Article.objects.filter(author=user).order_by(
+            '-created_at'
+        )[:10],
+        'my_newsletters': Newsletter.objects.filter(author=user).order_by(
+            '-created_at'
+        )[:10],
+        'is_editor': _user_is_editor(user),
+        'is_journalist': _user_is_journalist(user),
+        'is_reader': _user_has_role(user, 'reader'),
+        'role_pending': role_pending,
+    }
+    return render(request, 'news_app/dashboard.html', context)
+
+
+def article_page(request, article_id):
+    """Render a standalone page for a single article."""
+    article = get_object_or_404(Article, id=article_id)
+    if not article.approved and not (
+        _user_is_editor(request.user)
+        or (
+            request.user.is_authenticated
+            and article.author_id == request.user.id
+        )
+    ):
+        return HttpResponseForbidden('This article is not publicly available.')
+
+    return render(request, 'news_app/article_page.html', {'article': article})
+
+
+def newsletter_page(request, newsletter_id):
+    """Render a standalone page for a single newsletter."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    return render(
+        request,
+        'news_app/newsletter_page.html',
+        {'newsletter': newsletter},
+    )
+
+
+@login_required
+def article_create_view(request):
+    """Allow journalists to create new articles via website form."""
+    if not _user_is_journalist(request.user):
+        return HttpResponseForbidden('Only journalists can create articles.')
+
+    if request.method == 'POST':
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.author = request.user
+            article.approved = False
+            article.save()
+            _set_article_publisher_from_members(
+                article,
+                form.cleaned_data['publisher_members'],
+            )
+            messages.success(
+                request,
+                'Article created and submitted for editor approval.',
+            )
+            return redirect('dashboard')
+    else:
+        form = ArticleForm()
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Create Article',
+        'form': form,
+        'submit_label': 'Create Article',
+    })
+
+
+@login_required
+def article_edit_view(request, article_id):
+    """Allow editors and owner journalists to edit article content."""
+    article = get_object_or_404(Article, id=article_id)
+    is_editor = _user_is_editor(request.user)
+    is_owner_journalist = (
+        _user_is_journalist(request.user)
+        and article.author_id == request.user.id
+    )
+
+    if not (is_editor or is_owner_journalist):
+        return HttpResponseForbidden('You cannot edit this article.')
+
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            updated_article = form.save(commit=False)
+            if is_owner_journalist:
+                updated_article.approved = False
+            updated_article.save()
+            _set_article_publisher_from_members(
+                updated_article,
+                form.cleaned_data['publisher_members'],
+            )
+            messages.success(request, 'Article updated successfully.')
+            return redirect('dashboard')
+    else:
+        form = ArticleForm(instance=article)
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Edit Article',
+        'form': form,
+        'submit_label': 'Save Article',
+    })
+
+
+@login_required
+def newsletter_create_view(request):
+    """Allow journalists and editors to create newsletters."""
+    if not (
+        _user_is_journalist(request.user)
+        or _user_is_editor(request.user)
+    ):
+        return HttpResponseForbidden(
+            'Only journalists and editors can create newsletters.'
+        )
+
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST)
+        if form.is_valid():
+            newsletter = form.save(commit=False)
+            newsletter.author = request.user
+            newsletter.save()
+            form.save_m2m()
+            messages.success(request, 'Newsletter created successfully.')
+            return redirect('dashboard')
+    else:
+        form = NewsletterForm()
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Create Newsletter',
+        'form': form,
+        'submit_label': 'Create Newsletter',
+    })
+
+
+@login_required
+def newsletter_edit_view(request, newsletter_id):
+    """Allow editors and owner journalists to edit newsletters."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    is_editor = _user_is_editor(request.user)
+    is_owner_journalist = (
+        _user_is_journalist(request.user)
+        and newsletter.author_id == request.user.id
+    )
+
+    if not (is_editor or is_owner_journalist):
+        return HttpResponseForbidden('You cannot edit this newsletter.')
+
+    if request.method == 'POST':
+        form = NewsletterForm(request.POST, instance=newsletter)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Newsletter updated successfully.')
+            return redirect('dashboard')
+    else:
+        form = NewsletterForm(instance=newsletter)
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Edit Newsletter',
+        'form': form,
+        'submit_label': 'Save Newsletter',
+    })
+
+
+@login_required
+def subscription_view(request):
+    """Allow readers to manage publisher and journalist subscriptions."""
+    if not _user_has_role(request.user, 'reader'):
+        return HttpResponseForbidden('Only readers can manage subscriptions.')
+
+    if request.method == 'POST':
+        form = SubscriptionForm(request.POST)
+        if form.is_valid():
+            request.user.subscribed_publishers.set(
+                form.cleaned_data['publishers']
+            )
+            request.user.subscribed_journalists.set(
+                form.cleaned_data['journalists']
+            )
+            messages.success(request, 'Subscriptions updated.')
+            return redirect('dashboard')
+    else:
+        form = SubscriptionForm(initial={
+            'publishers': request.user.subscribed_publishers.all(),
+            'journalists': request.user.subscribed_journalists.all(),
+        })
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Manage Subscriptions',
+        'form': form,
+        'submit_label': 'Save Subscriptions',
+    })
+
+
+def _user_has_role(user, role_name):
+    """Return True when the user role/group/superuser matches the role name."""
+    if not user.is_authenticated:
+        return False
+
+    if role_name in {'editor', 'journalist'} and not getattr(
+        user,
+        'role_approved',
+        True,
+    ) and not user.is_superuser:
+        return False
+
+    return (
+        user.is_superuser
+        or getattr(user, 'role', '') == role_name
+        or user.groups.filter(name=role_name.title()).exists()
+    )
+
+
+def _user_is_editor(user):
+    """Return whether the user has editor access."""
+    return _user_has_role(user, 'editor')
+
+
+def _user_is_journalist(user):
+    """Return whether the user has journalist access."""
+    return _user_has_role(user, 'journalist')
+
+
+def _notify_approval(request, article):
+    """POST approval metadata to the local REST endpoint."""
+    target_url = request.build_absolute_uri(reverse('approved_log'))
     try:
-        requests.post('http://127.0.0.1:8001/api/approved/', json={
+        requests.post(target_url, json={
             'article_id': article.id,
             'title': article.title,
         }, timeout=2)
@@ -32,32 +348,147 @@ def _notify_approval(article):
     return True
 
 
+def _set_article_publisher_from_members(article, members):
+    """Create/update an article publisher from selected team members."""
+    selected_members = list(members)
+    if not selected_members:
+        article.publisher = None
+        article.save(update_fields=['publisher'])
+        return
+
+    sorted_names = sorted({member.username for member in selected_members})
+    publisher_name = 'Team: ' + ', '.join(sorted_names)
+    publisher, _ = Publisher.objects.get_or_create(name=publisher_name)
+
+    editor_ids = [m.id for m in selected_members if m.role == 'editor']
+    journalist_ids = [m.id for m in selected_members if m.role == 'journalist']
+    publisher.editors.set(CustomUser.objects.filter(id__in=editor_ids))
+    publisher.journalists.set(CustomUser.objects.filter(id__in=journalist_ids))
+
+    article.publisher = publisher
+    article.save(update_fields=['publisher'])
+
+
+def _email_approved_article(article):
+    """Email approved article content to interested subscribers."""
+    recipients = set(
+        CustomUser.objects.filter(
+            subscribed_journalists=article.author
+        ).exclude(email='').values_list('email', flat=True)
+    )
+
+    if article.publisher_id:
+        recipients.update(
+            article.publisher.subscribers.exclude(email='').values_list(
+                'email', flat=True
+            )
+        )
+
+    if not recipients:
+        return
+
+    send_mail(
+        subject=f'Approved Article: {article.title}',
+        message=(
+            f'Title: {article.title}\n\n'
+            f'Author: {article.author.username}\n\n'
+            f'{article.content}'
+        ),
+        from_email=None,
+        recipient_list=sorted(recipients),
+        fail_silently=True,
+    )
+
+
+def editor_review_queue(request):
+    """Render the editor queue for pending article approvals."""
+    if not _user_is_editor(request.user):
+        return HttpResponseForbidden('Only editors can review articles.')
+
+    pending_articles = Article.objects.filter(approved=False).order_by(
+        '-created_at'
+    )
+    return render(
+        request,
+        'news_app/editor_review.html',
+        {'pending_articles': pending_articles},
+    )
+
+
+@login_required
+def user_approval_queue(request):
+    """Render pending role approvals for editor/journalist accounts."""
+    if not (_user_is_editor(request.user) or request.user.is_superuser):
+        return HttpResponseForbidden('Only editors can approve role requests.')
+
+    pending_users = CustomUser.objects.filter(
+        role__in=['editor', 'journalist'],
+        role_approved=False,
+    ).order_by('date_joined')
+    return render(
+        request,
+        'news_app/user_approval.html',
+        {'pending_users': pending_users},
+    )
+
+
+@login_required
+@require_POST
+def approve_user_role(request, user_id):
+    """Approve a pending editor or journalist account request."""
+    if not (_user_is_editor(request.user) or request.user.is_superuser):
+        return HttpResponseForbidden('Only editors can approve role requests.')
+
+    pending_user = get_object_or_404(CustomUser, id=user_id)
+    if (
+        pending_user.role in {'editor', 'journalist'}
+        and not pending_user.role_approved
+    ):
+        pending_user.role_approved = True
+        pending_user.save(update_fields=['role_approved'])
+        messages.success(
+            request,
+            f'Approved role for {pending_user.username}.',
+        )
+
+    return redirect('user_approval_queue')
+
+
+@require_POST
 def approve_article(request, article_id):
+    """Approve an article and trigger subscriber notifications."""
     article = get_object_or_404(Article, id=article_id)
-    if request.user.is_authenticated and getattr(
-            request.user, 'role', None) == 'editor':
+
+    if not _user_is_editor(request.user):
+        return HttpResponseForbidden('Only editors can approve articles.')
+
+    if not article.approved:
         article.approved = True
-        article.save()
-        _notify_approval(article)
-    return redirect('home')
+        article.save(update_fields=['approved'])
+        _email_approved_article(article)
+        _notify_approval(request, article)
+        messages.success(request, 'Article approved successfully.')
+
+    return redirect('editor_review_queue')
 
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def article_list_create(request):
+    """List approved articles or create a new article as a journalist."""
     if request.method == 'GET':
         articles = Article.objects.filter(
             approved=True).order_by('-created_at')
         serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
-    if request.user.role != 'journalist':
+    if not _user_is_journalist(request.user):
         return Response({'detail': 'Only journalists can create articles.'},
                         status=status.HTTP_403_FORBIDDEN)
 
     serializer = ArticleSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(author=request.user)
+        serializer.save(author=request.user, approved=False)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,11 +496,12 @@ def article_list_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def article_subscribed(request):
-    if request.user.role != 'reader':
-        articles = Article.objects.filter(
-            approved=True).order_by('-created_at')
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
+    """Return approved articles that match the reader subscriptions."""
+    if not _user_has_role(request.user, 'reader'):
+        return Response(
+            {'detail': 'Only readers can use subscribed articles view.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
 
     subscribed_publishers = request.user.subscribed_publishers.values_list(
         'id', flat=True)
@@ -87,18 +519,43 @@ def article_subscribed(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def article_detail(request, article_id):
+    """Retrieve, update, or delete a single article by role rules."""
     article = get_object_or_404(Article, id=article_id)
+
     if request.method == 'GET':
+        if (
+            not article.approved
+            and not _user_is_editor(request.user)
+            and article.author_id != request.user.id
+        ):
+            return Response(
+                {'detail': 'Article is not approved.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         serializer = ArticleSerializer(article)
         return Response(serializer.data)
 
-    if request.user.role not in {'journalist', 'editor'}:
+    is_editor = _user_is_editor(request.user)
+    is_journalist = _user_is_journalist(request.user)
+
+    if not (is_editor or is_journalist):
         return Response(
             {
                 'detail': 'Only journalists and editors can modify articles.'},
             status=status.HTTP_403_FORBIDDEN)
 
+    if is_journalist and article.author_id != request.user.id:
+        return Response(
+            {'detail': 'Journalists can only modify their own articles.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
     if request.method == 'PUT':
+        if is_journalist and 'approved' in request.data:
+            return Response(
+                {'detail': 'Only editors can approve articles.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = ArticleSerializer(
             article, data=request.data, partial=True)
         if serializer.is_valid():
@@ -113,6 +570,7 @@ def article_detail(request, article_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def approved_log(request):
+    """Receive approved article callbacks from internal integrations."""
     return Response({'detail': 'approved article logged',
                      'article_id': request.data.get('article_id')},
                     status=status.HTTP_201_CREATED)
@@ -121,12 +579,16 @@ def approved_log(request):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def newsletter_list_create(request):
+    """List newsletters or create one as journalist/editor."""
     if request.method == 'GET':
         newsletters = Newsletter.objects.all()
         serializer = NewsletterSerializer(newsletters, many=True)
         return Response(serializer.data)
 
-    if request.user.role not in {'journalist', 'editor'}:
+    if not (
+        _user_is_journalist(request.user)
+        or _user_is_editor(request.user)
+    ):
         return Response(
             {
                 'detail': 'Only journalists and editors'
@@ -138,3 +600,42 @@ def newsletter_list_create(request):
         serializer.save(author=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def newsletter_detail(request, newsletter_id):
+    """Retrieve, update, or delete a newsletter based on role rules."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+
+    if request.method == 'GET':
+        serializer = NewsletterSerializer(newsletter)
+        return Response(serializer.data)
+
+    is_editor = _user_is_editor(request.user)
+    is_journalist = _user_is_journalist(request.user)
+    if not (is_editor or is_journalist):
+        return Response(
+            {'detail': 'Only journalists and editors can modify newsletters.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if is_journalist and newsletter.author_id != request.user.id:
+        return Response(
+            {'detail': 'Journalists can only modify their own newsletters.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    if request.method == 'PUT':
+        serializer = NewsletterSerializer(
+            newsletter,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    newsletter.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

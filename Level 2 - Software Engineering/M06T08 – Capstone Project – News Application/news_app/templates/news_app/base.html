@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}News Application{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'news_app/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="shell">
+        <h1>News Application</h1>
+        {% if request.user.is_authenticated %}
+            <p>Signed in as {{ request.user.username }} ({{ request.user.role }})</p>
+            <div class="actions">
+                <a class="button" href="{% url 'home' %}">Home</a>
+                <a class="button" href="{% url 'dashboard' %}">Dashboard</a>
+                {% if request.user.is_superuser or request.user.role == 'editor' and request.user.role_approved %}
+                    <a class="button" href="{% url 'editor_review_queue' %}">Article Reviews</a>
+                    <a class="button" href="{% url 'user_approval_queue' %}">Role Approvals</a>
+                {% endif %}
+                <a class="button" href="{% url 'logout' %}">Logout</a>
+            </div>
+        {% else %}
+            <p>Public reader view</p>
+            <div class="actions">
+                <a class="button" href="{% url 'home' %}">Home</a>
+                <a class="button" href="{% url 'login' %}">Login</a>
+                <a class="button" href="{% url 'register' %}">Create Account</a>
+            </div>
+        {% endif %}
+        </div>
+    </header>
+    <main class="shell">
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

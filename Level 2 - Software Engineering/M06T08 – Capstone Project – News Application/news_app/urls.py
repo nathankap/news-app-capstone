@@ -6,6 +6,51 @@ urlpatterns = [
         '',
         views.home,
         name='home'),
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('editor/user-approvals/', views.user_approval_queue, name='user_approval_queue'),
+    path(
+        'approve-user/<int:user_id>/',
+        views.approve_user_role,
+        name='approve_user_role',
+    ),
+    path(
+        'articles/<int:article_id>/',
+        views.article_page,
+        name='article_page',
+    ),
+    path('articles/create/', views.article_create_view, name='article_create'),
+    path(
+        'articles/<int:article_id>/edit/',
+        views.article_edit_view,
+        name='article_edit',
+    ),
+    path(
+        'newsletters/<int:newsletter_id>/',
+        views.newsletter_page,
+        name='newsletter_page',
+    ),
+    path(
+        'newsletters/create/',
+        views.newsletter_create_view,
+        name='newsletter_create',
+    ),
+    path(
+        'newsletters/<int:newsletter_id>/edit/',
+        views.newsletter_edit_view,
+        name='newsletter_edit',
+    ),
+    path(
+        'subscriptions/',
+        views.subscription_view,
+        name='subscriptions',
+    ),
+    path(
+        'editor/review/',
+        views.editor_review_queue,
+        name='editor_review_queue'),
     path(
         'approve-article/<int:article_id>/',
         views.approve_article,
@@ -30,4 +75,8 @@ urlpatterns = [
         'api/newsletters/',
         views.newsletter_list_create,
         name='newsletter_list_create'),
+    path(
+        'api/newsletters/<int:newsletter_id>/',
+        views.newsletter_detail,
+        name='newsletter_detail'),
 ]

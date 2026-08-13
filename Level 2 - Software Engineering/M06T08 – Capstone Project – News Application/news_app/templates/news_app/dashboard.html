@@ -1,0 +1,83 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>Your Dashboard</h2>
+    {% if role_pending %}
+        <p class="pending-note">Your {{ request.user.role }} role is pending approval. You can browse, but role actions unlock after approval.</p>
+    {% endif %}
+    <div class="actions">
+        {% if is_journalist %}
+            <a class="button" href="{% url 'article_create' %}">Create Article</a>
+        {% endif %}
+        {% if is_journalist or is_editor %}
+            <a class="button" href="{% url 'newsletter_create' %}">Create Newsletter</a>
+        {% endif %}
+        {% if is_editor %}
+            <a class="button" href="{% url 'editor_review_queue' %}">Review Pending Articles</a>
+            <a class="button" href="{% url 'user_approval_queue' %}">Approve Accounts</a>
+        {% endif %}
+        {% if is_reader %}
+            <a class="button" href="{% url 'subscriptions' %}">Manage Subscriptions</a>
+        {% endif %}
+    </div>
+</section>
+
+{% if is_editor %}
+<section class="card">
+    <h3>Pending Articles</h3>
+    {% if pending_articles %}
+        <ul>
+            {% for article in pending_articles %}
+                <li>{{ article.title }} by {{ article.author.username }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No pending articles.</p>
+    {% endif %}
+</section>
+{% endif %}
+
+{% if not is_editor %}
+<section class="card">
+    <h3>Your Articles</h3>
+    {% if my_articles %}
+        <ul class="stack-list">
+            {% for article in my_articles %}
+                <li>
+                    <a class="link-title" href="{% url 'article_page' article.id %}">{{ article.title }}</a>
+                    {% if article.approved %}(Approved){% else %}(Pending){% endif %}
+                    {% if is_journalist or is_editor %}
+                        <a href="{% url 'article_edit' article.id %}">Edit</a>
+                    {% endif %}
+                    <p class="summary">{{ article.content|truncatechars:140 }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No articles yet.</p>
+    {% endif %}
+</section>
+{% endif %}
+
+<section class="card">
+    <h3>Your Newsletters</h3>
+    {% if my_newsletters %}
+        <ul class="stack-list">
+            {% for newsletter in my_newsletters %}
+                <li>
+                    <a class="link-title" href="{% url 'newsletter_page' newsletter.id %}">{{ newsletter.title }}</a>
+                    {% if is_journalist or is_editor %}
+                        <a href="{% url 'newsletter_edit' newsletter.id %}">Edit</a>
+                    {% endif %}
+                    <p class="summary">{{ newsletter.description|default:'No description yet.'|truncatechars:120 }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No newsletters yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>{{ article.title }}</h2>
+    <p class="meta">By {{ article.author.username }}{% if article.publisher %} | {{ article.publisher.name }}{% endif %} | {{ article.created_at }}</p>
+    <p>{{ article.content|linebreaks }}</p>
+    <div class="actions">
+        <a class="button" href="{% url 'home' %}">Back Home</a>
+    </div>
+</section>
+{% endblock %}
