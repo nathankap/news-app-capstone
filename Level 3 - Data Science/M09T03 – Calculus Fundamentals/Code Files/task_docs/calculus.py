@@ -10,7 +10,7 @@ def model(x, m):
     Receives: a data point x and the line gradient m
     Returns: a prediction for y
     """
-    pass # Remove when function is written
+    return m * x
 
 def error_function(m):
     """
@@ -20,7 +20,8 @@ def error_function(m):
     Returns: J(m), the Mean Squared Error between the model and the data
     Hint: you can use the data itself (X and y) from this function
     """
-    pass # Remove when function is written
+    predictions = model(X, m)
+    return np.mean((predictions - y) ** 2)
 
 def derivative(m):
     """
@@ -28,7 +29,7 @@ def derivative(m):
     Receives: m, the gradient of the line
     Returns: dJ/dm, the derivative of the error function with respect to m
     """
-    pass # Remove when function is written
+    return (2 / len(X)) * np.sum(X * (model(X, m) - y))
 
 def update_step(m, learning_rate=0.01):
     """
@@ -36,7 +37,7 @@ def update_step(m, learning_rate=0.01):
     Receives: m, the gradient of the line
     Returns: a new and updated m
     """
-    pass # Remove when function is written
+    return m - learning_rate * derivative(m)
 
 m = -6
 n_epochs = 5 # This is just the number of update steps you take
