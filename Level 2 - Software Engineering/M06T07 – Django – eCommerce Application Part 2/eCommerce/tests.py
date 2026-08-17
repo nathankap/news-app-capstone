@@ -98,6 +98,33 @@ class EcommerceRequirementsTests(TestCase):
         )
         self.assertEqual(product_response.status_code, 201)
 
+    def test_vendor_add_product_page_requires_store_selection(self):
+        """The add-product form must capture which store owns the product."""
+        self.client.force_login(self.vendor)
+
+        response = self.client.get('/ecommerce/product/add/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="store_id"')
+
+        response = self.client.post(
+            '/ecommerce/product/add/',
+            {
+                'name': 'Selected Product',
+                'description': 'Chosen store',
+                'price': '8.99',
+                'stock': 2,
+                'store_id': self.store.id,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            Product.objects.filter(
+                name='Selected Product',
+                store=self.store,
+                vendor=self.vendor,
+            ).exists()
+        )
+
     def test_other_vendor_cannot_add_to_store(self):
         """A vendor cannot create products in another vendor's store."""
         self.client.force_login(self.other_vendor)

@@ -13,6 +13,14 @@
 
     <form method="POST">
         {% csrf_token %}
+        <label for="store_id">Store:</label>
+        <select name="store_id" id="store_id" required>
+            <option value="">Select a store</option>
+            {% for store in stores %}
+                <option value="{{ store.id }}">{{ store.name }}</option>
+            {% endfor %}
+        </select><br><br>
+
         <label>Name:</label>
         <input type="text" name="name" required><br><br>
 
