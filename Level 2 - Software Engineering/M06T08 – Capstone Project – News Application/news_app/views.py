@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from rest_framework import status
@@ -21,7 +22,7 @@ from .forms import (
     PublisherForm,
     SubscriptionForm,
 )
-from .models import Article, CustomUser, Newsletter, Publisher
+from .models import Article, CustomUser, Newsletter
 from .serializers import ArticleSerializer, NewsletterSerializer
 
 
@@ -165,23 +166,20 @@ def article_create_view(request):
         return HttpResponseForbidden('Only journalists can create articles.')
 
     if request.method == 'POST':
-        form = ArticleForm(request.POST)
+        form = ArticleForm(request.POST, user=request.user)
         if form.is_valid():
             article = form.save(commit=False)
             article.author = request.user
             article.approved = False
+            article.publisher = form.cleaned_data['publisher']
             article.save()
-            _set_article_publisher_from_members(
-                article,
-                form.cleaned_data['publisher_members'],
-            )
             messages.success(
                 request,
                 'Article created and submitted for editor approval.',
             )
             return redirect('dashboard')
     else:
-        form = ArticleForm()
+        form = ArticleForm(user=request.user)
 
     return render(request, 'news_app/content_form.html', {
         'title': 'Create Article',
@@ -204,20 +202,18 @@ def article_edit_view(request, article_id):
         return HttpResponseForbidden('You cannot edit this article.')
 
     if request.method == 'POST':
-        form = ArticleForm(request.POST, instance=article)
+        form = ArticleForm(request.POST, instance=article, user=request.user)
         if form.is_valid():
             updated_article = form.save(commit=False)
             if is_owner_journalist:
                 updated_article.approved = False
             updated_article.save()
-            _set_article_publisher_from_members(
-                updated_article,
-                form.cleaned_data['publisher_members'],
-            )
+            updated_article.publisher = form.cleaned_data['publisher']
+            updated_article.save(update_fields=['publisher'])
             messages.success(request, 'Article updated successfully.')
             return redirect('dashboard')
     else:
-        form = ArticleForm(instance=article)
+        form = ArticleForm(instance=article, user=request.user)
 
     return render(request, 'news_app/content_form.html', {
         'title': 'Edit Article',
@@ -286,6 +282,42 @@ def newsletter_edit_view(request, newsletter_id):
 
 
 @login_required
+@require_POST
+def article_delete_view(request, article_id):
+    """Delete an article for an editor or its journalist author."""
+    article = get_object_or_404(Article, id=article_id)
+    if not (
+        _user_is_editor(request.user)
+        or (
+            _user_is_journalist(request.user)
+            and article.author_id == request.user.id
+        )
+    ):
+        return HttpResponseForbidden('You cannot delete this article.')
+    article.delete()
+    messages.success(request, 'Article deleted successfully.')
+    return redirect('dashboard')
+
+
+@login_required
+@require_POST
+def newsletter_delete_view(request, newsletter_id):
+    """Delete a newsletter for an editor or its journalist author."""
+    newsletter = get_object_or_404(Newsletter, id=newsletter_id)
+    if not (
+        _user_is_editor(request.user)
+        or (
+            _user_is_journalist(request.user)
+            and newsletter.author_id == request.user.id
+        )
+    ):
+        return HttpResponseForbidden('You cannot delete this newsletter.')
+    newsletter.delete()
+    messages.success(request, 'Newsletter deleted successfully.')
+    return redirect('dashboard')
+
+
+@login_required
 def subscription_view(request):
     """Allow readers to manage publisher and journalist subscriptions."""
     if not _user_has_role(request.user, 'reader'):
@@ -301,6 +333,13 @@ def subscription_view(request):
                 form.cleaned_data['journalists']
             )
             messages.success(request, 'Subscriptions updated.')
+            next_url = request.POST.get('next')
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(next_url)
             return redirect('dashboard')
     else:
         form = SubscriptionForm(initial={
@@ -350,27 +389,6 @@ def _notify_approval(request, article):
     return True
 
 
-def _set_article_publisher_from_members(article, members):
-    """Create/update an article publisher from selected team members."""
-    selected_members = list(members)
-    if not selected_members:
-        article.publisher = None
-        article.save(update_fields=['publisher'])
-        return
-
-    sorted_names = sorted({member.username for member in selected_members})
-    publisher_name = 'Team: ' + ', '.join(sorted_names)
-    publisher, _ = Publisher.objects.get_or_create(name=publisher_name)
-
-    editor_ids = [m.id for m in selected_members if m.role == 'editor']
-    journalist_ids = [m.id for m in selected_members if m.role == 'journalist']
-    publisher.editors.set(CustomUser.objects.filter(id__in=editor_ids))
-    publisher.journalists.set(CustomUser.objects.filter(id__in=journalist_ids))
-
-    article.publisher = publisher
-    article.save(update_fields=['publisher'])
-
-
 def _email_approved_article(article):
     """Email approved article content to interested subscribers."""
     recipients = set(
@@ -407,13 +425,11 @@ def editor_review_queue(request):
     if not _user_is_editor(request.user):
         return HttpResponseForbidden('Only editors can review articles.')
 
-    pending_articles = Article.objects.filter(approved=False).order_by(
-        '-created_at'
-    )
+    articles = Article.objects.order_by('-created_at')
     return render(
         request,
         'news_app/editor_review.html',
-        {'pending_articles': pending_articles},
+        {'articles': articles},
     )
 
 

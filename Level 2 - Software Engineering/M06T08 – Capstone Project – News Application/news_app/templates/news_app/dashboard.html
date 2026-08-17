@@ -37,7 +37,6 @@
 </section>
 {% endif %}
 
-{% if not is_editor %}
 <section class="card">
     <h3>Your Articles</h3>
     {% if my_articles %}
@@ -48,6 +47,10 @@
                     {% if article.approved %}(Approved){% else %}(Pending){% endif %}
                     {% if is_journalist or is_editor %}
                         <a href="{% url 'article_edit' article.id %}">Edit</a>
+                        <form method="post" action="{% url 'article_delete' article.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Delete</button>
+                        </form>
                     {% endif %}
                     <p class="summary">{{ article.content|truncatechars:140 }}</p>
                 </li>
@@ -68,6 +71,10 @@
                     <a class="link-title" href="{% url 'newsletter_page' newsletter.id %}">{{ newsletter.title }}</a>
                     {% if is_journalist or is_editor %}
                         <a href="{% url 'newsletter_edit' newsletter.id %}">Edit</a>
+                        <form method="post" action="{% url 'newsletter_delete' newsletter.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Delete</button>
+                        </form>
                     {% endif %}
                     <p class="summary">{{ newsletter.description|default:'No description yet.'|truncatechars:120 }}</p>
                 </li>

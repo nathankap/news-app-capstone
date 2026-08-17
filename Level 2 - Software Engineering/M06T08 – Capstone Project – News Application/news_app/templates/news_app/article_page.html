@@ -5,8 +5,25 @@
 {% block content %}
 <section class="card">
     <h2>{{ article.title }}</h2>
-    <p class="meta">By {{ article.author.username }}{% if article.publisher %} | {{ article.publisher.name }}{% endif %} | {{ article.created_at }}</p>
+    <p class="meta">By {{ article.author.username }} | Publisher: {% if article.publisher %}{{ article.publisher.name }}{% else %}Independent{% endif %} | {{ article.created_at }}</p>
     <p>{{ article.content|linebreaks }}</p>
+    {% if user.is_authenticated and user.role == 'reader' %}
+        <form method="post" action="{% url 'subscriptions' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            {% if article.publisher %}
+                <label>
+                    <input type="checkbox" name="publishers" value="{{ article.publisher.id }}" {% if article.publisher in user.subscribed_publishers.all %}checked{% endif %}>
+                    Subscribe to {{ article.publisher.name }}
+                </label>
+            {% endif %}
+            <label>
+                <input type="checkbox" name="journalists" value="{{ article.author.id }}" {% if article.author in user.subscribed_journalists.all %}checked{% endif %}>
+                Subscribe to {{ article.author.username }}
+            </label>
+            <button type="submit">Update Subscriptions</button>
+        </form>
+    {% endif %}
     <div class="actions">
         <a class="button" href="{% url 'home' %}">Back Home</a>
     </div>

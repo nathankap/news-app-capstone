@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
         max_length=20,
         choices=ROLE_CHOICES,
         default='reader')
+    email = models.EmailField(unique=True, blank=True, null=True)
     subscribed_publishers = models.ManyToManyField(
         'Publisher', blank=True, related_name='subscribers')
     subscribed_journalists = models.ManyToManyField(

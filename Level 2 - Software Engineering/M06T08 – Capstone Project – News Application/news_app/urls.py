@@ -27,6 +27,11 @@ urlpatterns = [
         name='article_edit',
     ),
     path(
+        'articles/<int:article_id>/delete/',
+        views.article_delete_view,
+        name='article_delete',
+    ),
+    path(
         'newsletters/<int:newsletter_id>/',
         views.newsletter_page,
         name='newsletter_page',
@@ -40,6 +45,11 @@ urlpatterns = [
         'newsletters/<int:newsletter_id>/edit/',
         views.newsletter_edit_view,
         name='newsletter_edit',
+    ),
+    path(
+        'newsletters/<int:newsletter_id>/delete/',
+        views.newsletter_delete_view,
+        name='newsletter_delete',
     ),
     path(
         'subscriptions/',

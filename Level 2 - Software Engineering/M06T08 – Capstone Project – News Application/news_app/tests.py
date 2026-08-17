@@ -15,11 +15,14 @@ class NewsApiTests(TestCase):
         self.client = APIClient()
         self.user_model = get_user_model()
         self.reader = self.user_model.objects.create_user(
-            username='reader', password='secret', role='reader')
+            username='reader', password='secret', role='reader',
+            email='reader@example.com')
         self.journalist = self.user_model.objects.create_user(
-            username='journalist', password='secret', role='journalist')
+            username='journalist', password='secret', role='journalist',
+            email='journalist@example.com')
         self.editor = self.user_model.objects.create_user(
-            username='editor', password='secret', role='editor')
+            username='editor', password='secret', role='editor',
+            email='editor@example.com')
         self.publisher = Publisher.objects.create(name='Test Publisher')
         self.article = Article.objects.create(
             title='Example',
@@ -66,6 +69,21 @@ class NewsApiTests(TestCase):
         second_editor = self.user_model.objects.get(username='second-editor')
         self.assertEqual(second_editor.role, 'editor')
 
+    def test_registration_rejects_duplicate_email(self):
+        """Registration must not allow an email address to be reused."""
+        response = self.client.post('/register/', {
+            'username': 'duplicate-email',
+            'email': self.reader.email,
+            'role': 'reader',
+            'password1': 'Password123!abc',
+            'password2': 'Password123!abc',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'already exists')
+        self.assertFalse(
+            self.user_model.objects.filter(username='duplicate-email').exists()
+        )
+
     def test_editor_can_create_publisher_and_assign_members(self):
         """Editors can manage publisher membership in the website."""
         client = self.client_class()
@@ -102,6 +120,27 @@ class NewsApiTests(TestCase):
         }, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertFalse(response.json()['approved'])
+
+    def test_article_form_lists_assigned_publishers_and_independent(self):
+        """Journalists choose an assigned publisher or Independent."""
+        assigned = Publisher.objects.create(name='Assigned')
+        assigned.journalists.add(self.journalist)
+        Publisher.objects.create(name='Not assigned')
+        client = self.client_class()
+        client.force_login(self.journalist)
+        response = client.get('/articles/create/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Assigned')
+        self.assertContains(response, 'Independent')
+        self.assertNotContains(response, 'Not assigned')
+
+    def test_journalist_can_delete_own_article_from_website(self):
+        """Journalists can delete their own articles from the dashboard."""
+        client = self.client_class()
+        client.force_login(self.journalist)
+        response = client.post(f'/articles/{self.article.id}/delete/')
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Article.objects.filter(pk=self.article.pk).exists())
 
     def test_reader_cannot_create_article(self):
         """Readers cannot create articles."""
@@ -231,3 +270,28 @@ class NewsApiTests(TestCase):
             f'/api/newsletters/{newsletter_id}/'
         )
         self.assertEqual(delete_response.status_code, 204)
+
+    def test_reader_can_unsubscribe_from_article_page(self):
+        """Article-level subscription controls support unsubscribe."""
+        self.reader.subscribed_publishers.add(self.publisher)
+        client = self.client_class()
+        client.force_login(self.reader)
+        response = client.post(
+            f'/subscriptions/?next=/articles/{self.article.id}/',
+            {'publishers': [], 'journalists': []},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(
+            self.reader.subscribed_publishers.filter(
+                pk=self.publisher.pk
+            ).exists()
+        )
+
+    def test_reader_article_page_shows_subscription_controls(self):
+        """Readers see article publisher and journalist subscription options."""
+        client = self.client_class()
+        client.force_login(self.reader)
+        response = client.get(f'/articles/{self.article.id}/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Subscribe to Test Publisher')
+        self.assertContains(response, 'Subscribe to journalist')

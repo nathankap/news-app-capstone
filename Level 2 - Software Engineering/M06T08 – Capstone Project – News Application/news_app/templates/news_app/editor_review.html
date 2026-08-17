@@ -5,7 +5,7 @@
 {% block content %}
 <section class="card">
     <h2>Pending Article Approvals</h2>
-    {% if pending_articles %}
+    {% if articles %}
         <table>
             <thead>
                 <tr>
@@ -13,20 +13,27 @@
                     <th>Author</th>
                     <th>Publisher</th>
                     <th>Created</th>
-                    <th>Action</th>
+                        <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for article in pending_articles %}
+                {% for article in articles %}
                     <tr>
                         <td>{{ article.title }}</td>
                         <td>{{ article.author.username }}</td>
                         <td>{% if article.publisher %}{{ article.publisher.name }}{% else %}Independent{% endif %}</td>
                         <td>{{ article.created_at }}</td>
                         <td>
-                            <form method="post" action="{% url 'approve_article' article.id %}">
+                            {% if not article.approved %}
+                                <form method="post" action="{% url 'approve_article' article.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Approve</button>
+                                </form>
+                            {% else %}Approved{% endif %}
+                            <a href="{% url 'article_edit' article.id %}">Edit</a>
+                            <form method="post" action="{% url 'article_delete' article.id %}">
                                 {% csrf_token %}
-                                <button type="submit">Approve</button>
+                                <button type="submit">Delete</button>
                             </form>
                         </td>
                     </tr>

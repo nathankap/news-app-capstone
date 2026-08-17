@@ -24,6 +24,14 @@ class RegisterForm(UserCreationForm):
             'Editors can manage publishers and approve submitted articles.'
         )
 
+    def clean_email(self):
+        email = self.cleaned_data['email'].lower()
+        if CustomUser.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                'An account with this email already exists.'
+            )
+        return email
+
 
 class PublisherForm(forms.ModelForm):
     """Form for editors to create publishers and assign their members."""
@@ -49,29 +57,33 @@ class PublisherForm(forms.ModelForm):
 class ArticleForm(forms.ModelForm):
     """Website form for journalist article creation and editing."""
 
-    publisher_members = forms.ModelMultipleChoiceField(
-        queryset=CustomUser.objects.filter(role__in=['editor', 'journalist']),
+    publisher = forms.ModelChoiceField(
+        queryset=Publisher.objects.none(),
         required=False,
-        widget=forms.CheckboxSelectMultiple,
-        label='Publisher Team (optional)',
-        help_text=(
-            'Select one or more editors/journalists to represent '
-            'publisher content.'
-        ),
+        empty_label='Independent',
+        label='Publisher (optional)',
     )
 
     class Meta:
         model = Article
         fields = ['title', 'content']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk and self.instance.publisher_id:
-            publisher = self.instance.publisher
-            initial_members = list(publisher.editors.all()) + list(
-                publisher.journalists.all()
+        if user is not None and user.role == 'journalist':
+            self.fields['publisher'].queryset = Publisher.objects.filter(
+                journalists=user
+            ).order_by('name')
+        elif user is not None:
+            self.fields['publisher'].queryset = Publisher.objects.order_by(
+                'name'
             )
-            self.fields['publisher_members'].initial = initial_members
+        elif self.instance and self.instance.publisher_id:
+            self.fields['publisher'].queryset = Publisher.objects.filter(
+                pk=self.instance.publisher_id
+            )
+        if self.instance and self.instance.pk:
+            self.fields['publisher'].initial = self.instance.publisher_id
 
 
 class NewsletterForm(forms.ModelForm):
