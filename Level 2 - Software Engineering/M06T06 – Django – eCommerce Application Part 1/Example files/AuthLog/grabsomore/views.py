@@ -63,11 +63,19 @@ def register_user(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password')
+        password_confirmation = request.POST.get('password_confirmation')
         email = request.POST.get('email', '').strip().lower()
         role = request.POST.get('role', 'buyer')
 
-        if not username or not password or not email:
+        if not all([username, password, password_confirmation, email]):
             return render(request, 'grabsomore/register.html', {'error': 'All fields are required.'})
+
+        if password != password_confirmation:
+            return render(
+                request,
+                'grabsomore/register.html',
+                {'error': 'Passwords do not match.'}
+            )
 
         if User.objects.filter(email__iexact=email).exists():
             return render(request, 'grabsomore/register.html', {'error': 'That email is already registered.'})
