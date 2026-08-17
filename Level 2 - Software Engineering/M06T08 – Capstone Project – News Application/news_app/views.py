@@ -18,6 +18,7 @@ from .forms import (
     CustomAuthenticationForm,
     NewsletterForm,
     RegisterForm,
+    PublisherForm,
     SubscriptionForm,
 )
 from .models import Article, CustomUser, Newsletter, Publisher
@@ -49,16 +50,7 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            if user.role in {'editor', 'journalist'}:
-                user.role_approved = False
-                user.save(update_fields=['role_approved'])
-                messages.info(
-                    request,
-                    (
-                        'Account created. Your role must be approved by '
-                        'an editor or admin.'
-                    ),
-                )
+            messages.success(request, 'Account created successfully.')
             login(request, user)
             return redirect('dashboard')
     else:
@@ -102,10 +94,6 @@ def logout_view(request):
 def dashboard_view(request):
     """Render role-aware dashboard actions and user content."""
     user = request.user
-    role_pending = (
-        user.role in {'editor', 'journalist'}
-        and not getattr(user, 'role_approved', True)
-    )
     context = {
         'pending_articles': Article.objects.filter(approved=False).order_by(
             '-created_at'
@@ -119,7 +107,6 @@ def dashboard_view(request):
         'is_editor': _user_is_editor(user),
         'is_journalist': _user_is_journalist(user),
         'is_reader': _user_has_role(user, 'reader'),
-        'role_pending': role_pending,
     }
     return render(request, 'news_app/dashboard.html', context)
 
@@ -147,6 +134,28 @@ def newsletter_page(request, newsletter_id):
         'news_app/newsletter_page.html',
         {'newsletter': newsletter},
     )
+
+
+@login_required
+def publisher_create_view(request):
+    """Allow editors to create publishers and assign team members."""
+    if not _user_is_editor(request.user):
+        return HttpResponseForbidden('Only editors can manage publishers.')
+
+    if request.method == 'POST':
+        form = PublisherForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Publisher created successfully.')
+            return redirect('dashboard')
+    else:
+        form = PublisherForm()
+
+    return render(request, 'news_app/content_form.html', {
+        'title': 'Create Publisher',
+        'form': form,
+        'submit_label': 'Create Publisher',
+    })
 
 
 @login_required
@@ -311,13 +320,6 @@ def _user_has_role(user, role_name):
     if not user.is_authenticated:
         return False
 
-    if role_name in {'editor', 'journalist'} and not getattr(
-        user,
-        'role_approved',
-        True,
-    ) and not user.is_superuser:
-        return False
-
     return (
         user.is_superuser
         or getattr(user, 'role', '') == role_name
@@ -413,45 +415,6 @@ def editor_review_queue(request):
         'news_app/editor_review.html',
         {'pending_articles': pending_articles},
     )
-
-
-@login_required
-def user_approval_queue(request):
-    """Render pending role approvals for editor/journalist accounts."""
-    if not (_user_is_editor(request.user) or request.user.is_superuser):
-        return HttpResponseForbidden('Only editors can approve role requests.')
-
-    pending_users = CustomUser.objects.filter(
-        role__in=['editor', 'journalist'],
-        role_approved=False,
-    ).order_by('date_joined')
-    return render(
-        request,
-        'news_app/user_approval.html',
-        {'pending_users': pending_users},
-    )
-
-
-@login_required
-@require_POST
-def approve_user_role(request, user_id):
-    """Approve a pending editor or journalist account request."""
-    if not (_user_is_editor(request.user) or request.user.is_superuser):
-        return HttpResponseForbidden('Only editors can approve role requests.')
-
-    pending_user = get_object_or_404(CustomUser, id=user_id)
-    if (
-        pending_user.role in {'editor', 'journalist'}
-        and not pending_user.role_approved
-    ):
-        pending_user.role_approved = True
-        pending_user.save(update_fields=['role_approved'])
-        messages.success(
-            request,
-            f'Approved role for {pending_user.username}.',
-        )
-
-    return redirect('user_approval_queue')
 
 
 @require_POST

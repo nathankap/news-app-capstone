@@ -21,7 +21,28 @@ class RegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['role'].help_text = (
-            'Editor and journalist accounts require approval before use.'
+            'Editors can manage publishers and approve submitted articles.'
+        )
+
+
+class PublisherForm(forms.ModelForm):
+    """Form for editors to create publishers and assign their members."""
+
+    class Meta:
+        model = Publisher
+        fields = ['name', 'editors', 'journalists']
+        widgets = {
+            'editors': forms.CheckboxSelectMultiple,
+            'journalists': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['editors'].queryset = CustomUser.objects.filter(
+            role='editor'
+        )
+        self.fields['journalists'].queryset = CustomUser.objects.filter(
+            role='journalist'
         )
 
 

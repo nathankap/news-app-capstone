@@ -5,9 +5,6 @@
 {% block content %}
 <section class="card">
     <h2>Your Dashboard</h2>
-    {% if role_pending %}
-        <p class="pending-note">Your {{ request.user.role }} role is pending approval. You can browse, but role actions unlock after approval.</p>
-    {% endif %}
     <div class="actions">
         {% if is_journalist %}
             <a class="button" href="{% url 'article_create' %}">Create Article</a>
@@ -17,7 +14,7 @@
         {% endif %}
         {% if is_editor %}
             <a class="button" href="{% url 'editor_review_queue' %}">Review Pending Articles</a>
-            <a class="button" href="{% url 'user_approval_queue' %}">Approve Accounts</a>
+            <a class="button" href="{% url 'publisher_create' %}">Manage Publishers</a>
         {% endif %}
         {% if is_reader %}
             <a class="button" href="{% url 'subscriptions' %}">Manage Subscriptions</a>

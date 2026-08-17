@@ -14,7 +14,7 @@ Make sure these are already installed on your machine:
 
 ```powershell
 git clone https://github.com/nathankap/Capstone-Project---News-Application.git
-cd "M06T08 – Capstone Project – News Application"
+cd "Capstone-Project---News-Application"
 ```
 
 ## 3. Create and activate virtual environment
@@ -98,15 +98,20 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-## 10. Create users for quick article check
+## 10. Register an editor in the website
 
-Create one editor and one journalist:
+Editor, journalist, and reader accounts are available immediately after
+registration. Account approval is not required. Editors approve submitted
+articles and manage publishers; the admin panel is not required for normal
+application use.
 
-```powershell
-python manage.py shell -c "from django.contrib.auth import get_user_model; U=get_user_model(); U.objects.create_user(username='editor1', password='Password123!', role='editor', role_approved=True); U.objects.create_user(username='journalist1', password='Password123!', role='journalist', role_approved=True); print('Users created')"
-```
+Continue to the browser after starting the server in step 11 and:
 
-If users already exist, you can skip this step.
+1. Open `http://127.0.0.1:8000/`.
+2. Click `Create Account`.
+3. Register an account with the `Editor` role.
+4. The editor can now open the dashboard, manage publishers, and approve
+	submitted articles.
 
 ## 11. Start server
 
@@ -118,18 +123,16 @@ Keep this terminal open while testing.
 
 ## 12. Check article flow in browser
 
-1. Open http://127.0.0.1:8000/
-2. Click Login.
-3. Login as journalist1 / Password123!
-4. Open Dashboard.
-5. Click Create Article.
-6. Enter title and content, submit.
-7. Logout.
-8. Login as editor1 / Password123!
-9. Open Dashboard.
-10. Click Review Pending Articles.
-11. Approve the article.
-12. Go to Home and click the article title to open full article page.
+1. If logged in as the editor, click `Logout`.
+2. Click `Create Account` and register a `Journalist` account.
+3. Log in as the journalist and open `Dashboard`.
+4. Click `Create Article`.
+5. Enter a title and article content, then submit.
+6. Click `Logout`.
+7. Log in as the editor.
+8. Open `Dashboard` and click `Review Pending Articles`.
+9. Approve the article.
+10. Go to `Home` and click the article title to open the full article page.
 
 You have now verified article creation, approval, and viewing.
 

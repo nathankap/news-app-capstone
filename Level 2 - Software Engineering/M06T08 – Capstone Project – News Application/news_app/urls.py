@@ -10,11 +10,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('editor/user-approvals/', views.user_approval_queue, name='user_approval_queue'),
     path(
-        'approve-user/<int:user_id>/',
-        views.approve_user_role,
-        name='approve_user_role',
+        'publishers/create/',
+        views.publisher_create_view,
+        name='publisher_create',
     ),
     path(
         'articles/<int:article_id>/',

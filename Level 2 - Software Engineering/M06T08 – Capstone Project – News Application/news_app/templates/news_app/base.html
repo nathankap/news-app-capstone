@@ -16,9 +16,9 @@
             <div class="actions">
                 <a class="button" href="{% url 'home' %}">Home</a>
                 <a class="button" href="{% url 'dashboard' %}">Dashboard</a>
-                {% if request.user.is_superuser or request.user.role == 'editor' and request.user.role_approved %}
+                {% if request.user.is_superuser or request.user.role == 'editor' %}
                     <a class="button" href="{% url 'editor_review_queue' %}">Article Reviews</a>
-                    <a class="button" href="{% url 'user_approval_queue' %}">Role Approvals</a>
+                    <a class="button" href="{% url 'publisher_create' %}">Manage Publishers</a>
                 {% endif %}
                 <a class="button" href="{% url 'logout' %}">Logout</a>
             </div>

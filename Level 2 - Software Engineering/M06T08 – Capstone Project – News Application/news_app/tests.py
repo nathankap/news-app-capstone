@@ -39,6 +39,47 @@ class NewsApiTests(TestCase):
         self.assertContains(response, 'Example')
         self.assertContains(response, 'Weekly')
 
+    def test_editor_registration_is_immediately_available(self):
+        """Editors can operate a blank database without account approval."""
+        self.user_model.objects.all().delete()
+        response = self.client.post('/register/', {
+            'username': 'first-editor',
+            'email': 'first@example.com',
+            'role': 'editor',
+            'password1': 'Password123!abc',
+            'password2': 'Password123!abc',
+        })
+        self.assertEqual(response.status_code, 302)
+        first_editor = self.user_model.objects.get(username='first-editor')
+        self.assertEqual(first_editor.role, 'editor')
+
+    def test_later_editor_registration_is_also_immediately_available(self):
+        """Later elevated accounts do not require account approval."""
+        response = self.client.post('/register/', {
+            'username': 'second-editor',
+            'email': 'second@example.com',
+            'role': 'editor',
+            'password1': 'Password123!abc',
+            'password2': 'Password123!abc',
+        })
+        self.assertEqual(response.status_code, 302)
+        second_editor = self.user_model.objects.get(username='second-editor')
+        self.assertEqual(second_editor.role, 'editor')
+
+    def test_editor_can_create_publisher_and_assign_members(self):
+        """Editors can manage publisher membership in the website."""
+        client = self.client_class()
+        client.force_login(self.editor)
+        response = client.post('/publishers/create/', {
+            'name': 'News Desk',
+            'editors': [self.editor.id],
+            'journalists': [self.journalist.id],
+        })
+        self.assertEqual(response.status_code, 302)
+        publisher = Publisher.objects.get(name='News Desk')
+        self.assertIn(self.editor, publisher.editors.all())
+        self.assertIn(self.journalist, publisher.journalists.all())
+
     def test_reader_can_list_approved_articles(self):
         """Readers can call the approved article listing endpoint."""
         self.client.force_authenticate(self.reader)
