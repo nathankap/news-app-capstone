@@ -2,10 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Catalog</title>
+    <title>{{ page_title|default:'Product Catalog' }}</title>
 </head>
 <body>
-    <h1>Product Catalog</h1>
+    <h1>{{ page_title|default:'Product Catalog' }}</h1>
+
+    <nav>
+        <a href="{% url 'eCommerce:vendors_list' %}">Vendors</a> |
+        <a href="{% url 'eCommerce:stores_list' %}">Stores</a> |
+        <a href="{% url 'eCommerce:products_list' %}">All Products</a>
+        {% if is_vendor %} |
+            <a href="{% url 'eCommerce:vendor_reviews' %}">My Reviews</a>
+        {% endif %}
+    </nav>
+    {% if store %}
+        <p>Vendor: <a href="{% url 'eCommerce:vendor_stores' store.owner.id %}">{{ store.owner.username }}</a></p>
+    {% endif %}
 
     {% if products %}
         <table border="1" cellpadding="10" cellspacing="0">
@@ -22,6 +34,7 @@
                     <tr>
                         <td><a href="{% url 'eCommerce:product_detail' product.id %}">{{ product.name }}</a></td>
                         <td>{{ product.description }}</td>
+                        <td>{% if product.store %}<a href="{% url 'eCommerce:store_products' product.store.id %}">{{ product.store.name }}</a>{% else %}No store{% endif %}</td>
                         <td>R{{ product.price }}</td>
                         <td>
                             <form method="POST" action="{% url 'eCommerce:add_to_cart' %}">

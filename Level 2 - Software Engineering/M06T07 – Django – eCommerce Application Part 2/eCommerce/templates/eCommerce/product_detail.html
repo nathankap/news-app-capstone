@@ -10,6 +10,9 @@
     <p><strong>Price:</strong> R{{ product.price }}</p>
     <p><strong>Stock:</strong> {{ product.stock }}</p>
     <p><strong>Vendor:</strong> {% if product.vendor %}{{ product.vendor.username }}{% else %}Unknown Vendor{% endif %}</p>
+    {% if product.store %}
+        <p><strong>Store:</strong> <a href="{% url 'eCommerce:store_products' product.store.id %}">{{ product.store.name }}</a></p>
+    {% endif %}
 
     <form method="POST" action="{% url 'eCommerce:add_to_cart' %}">
         {% csrf_token %}

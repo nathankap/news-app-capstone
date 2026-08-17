@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Product Reviews</title>
+</head>
+<body>
+    <h1>My Product Reviews</h1>
+    <nav>
+        <a href="{% url 'eCommerce:vendors_list' %}">Vendors</a> |
+        <a href="{% url 'eCommerce:stores_list' %}">Stores</a> |
+        <a href="{% url 'eCommerce:products_list' %}">All Products</a>
+    </nav>
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <strong>{{ review.product.name }}</strong>
+                    {% if review.product.store %}
+                        in {{ review.product.store.name }}
+                    {% endif %}
+                    - {{ review.rating }}/5 by {{ review.user.username }}
+                    {% if review.verified %}(Verified){% endif %}
+                    <p>{{ review.comment }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews have been submitted for your products.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if vendor %}{{ vendor.username }}'s Stores{% else %}Stores{% endif %}</title>
+</head>
+<body>
+    <h1>{% if vendor %}{{ vendor.username }}'s Stores{% else %}Stores{% endif %}</h1>
+    <nav>
+        <a href="{% url 'eCommerce:vendors_list' %}">Vendors</a> |
+        <a href="{% url 'eCommerce:stores_list' %}">All Stores</a> |
+        <a href="{% url 'eCommerce:products_list' %}">All Products</a>
+        {% if is_vendor %} |
+            <a href="{% url 'eCommerce:vendor_reviews' %}">My Reviews</a>
+        {% endif %}
+    </nav>
+    {% if manage_stores and is_vendor %}
+        <a href="{% url 'eCommerce:create_store' %}"><button>Create Store</button></a>
+    {% endif %}
+    <hr>
+    {% if stores %}
+        <ul>
+            {% for store in stores %}
+                <li>
+                    <strong>{{ store.name }}</strong><br>
+                    {{ store.description }}<br>
+                    Owner: <a href="{% url 'eCommerce:vendor_stores' store.owner.id %}">{{ store.owner.username }}</a><br>
+                    <a href="{% url 'eCommerce:store_products' store.id %}"><button>View Products</button></a>
+                    {% if request.user == store.owner %}
+                        <a href="{% url 'eCommerce:edit_store' store.id %}"><button>Edit</button></a>
+                        <a href="{% url 'eCommerce:delete_store' store.id %}"><button>Delete</button></a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have not created any stores yet.</p>
+    {% endif %}
+    <br>
+    <a href="{% url 'eCommerce:products_list' %}"><button>Back to Catalog</button></a>
+</body>
+</html>

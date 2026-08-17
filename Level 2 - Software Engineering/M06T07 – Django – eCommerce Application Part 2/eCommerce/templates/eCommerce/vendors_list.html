@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendors</title>
+</head>
+<body>
+    <h1>Vendors</h1>
+    <nav>
+        <a href="{% url 'eCommerce:vendors_list' %}">Vendors</a> |
+        <a href="{% url 'eCommerce:stores_list' %}">Stores</a> |
+        <a href="{% url 'eCommerce:products_list' %}">All Products</a>
+    </nav>
+    {% if vendors %}
+        <ul>
+            {% for vendor in vendors %}
+                <li>
+                    <a href="{% url 'eCommerce:vendor_stores' vendor.id %}">
+                        {{ vendor.username }}'s stores
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No vendors are registered yet.</p>
+    {% endif %}
+</body>
+</html>
