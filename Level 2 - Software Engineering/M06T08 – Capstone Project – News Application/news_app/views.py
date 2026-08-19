@@ -22,7 +22,7 @@ from .forms import (
     PublisherForm,
     SubscriptionForm,
 )
-from .models import Article, CustomUser, Newsletter
+from .models import Article, CustomUser, Newsletter, Publisher
 from .serializers import ArticleSerializer, NewsletterSerializer
 
 
@@ -156,6 +156,7 @@ def publisher_create_view(request):
         'title': 'Create Publisher',
         'form': form,
         'submit_label': 'Create Publisher',
+        'publishers': Publisher.objects.order_by('name'),
     })
 
 
@@ -421,7 +422,7 @@ def _email_approved_article(article):
 
 
 def editor_review_queue(request):
-    """Render the editor queue for pending article approvals."""
+    """Render the editor queue for pending and approved articles."""
     if not _user_is_editor(request.user):
         return HttpResponseForbidden('Only editors can review articles.')
 
@@ -429,7 +430,10 @@ def editor_review_queue(request):
     return render(
         request,
         'news_app/editor_review.html',
-        {'articles': articles},
+        {
+            'pending_articles': [a for a in articles if not a.approved],
+            'approved_articles': [a for a in articles if a.approved],
+        },
     )
 
 
@@ -443,7 +447,8 @@ def approve_article(request, article_id):
 
     if not article.approved:
         article.approved = True
-        article.save(update_fields=['approved'])
+        article.approved_by = request.user
+        article.save(update_fields=['approved', 'approved_by'])
         _email_approved_article(article)
         _notify_approval(request, article)
         messages.success(request, 'Article approved successfully.')

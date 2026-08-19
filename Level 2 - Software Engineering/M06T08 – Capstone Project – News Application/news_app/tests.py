@@ -35,6 +35,14 @@ class NewsApiTests(TestCase):
             title='Weekly', description='desc', author=self.journalist)
         self.newsletter.articles.add(self.article)
 
+    def test_dashboard_renders_for_each_role(self):
+        """Dashboard must render without template errors for every role."""
+        for user in (self.reader, self.journalist, self.editor):
+            client = self.client_class()
+            client.force_login(user)
+            response = client.get('/dashboard/')
+            self.assertEqual(response.status_code, 200)
+
     def test_home_page_lists_approved_articles_and_newsletters(self):
         """Home page should render approved content lists."""
         response = self.client.get('/')
@@ -83,6 +91,14 @@ class NewsApiTests(TestCase):
         self.assertFalse(
             self.user_model.objects.filter(username='duplicate-email').exists()
         )
+
+    def test_publisher_create_page_lists_existing_publishers(self):
+        """The publisher creation page lists already-created publishers."""
+        client = self.client_class()
+        client.force_login(self.editor)
+        response = client.get('/publishers/create/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Publisher')
 
     def test_editor_can_create_publisher_and_assign_members(self):
         """Editors can manage publisher membership in the website."""
@@ -221,6 +237,7 @@ class NewsApiTests(TestCase):
         self.assertEqual(response.status_code, 302)
         approved_article = Article.objects.get(pk=article.pk)
         self.assertTrue(approved_article.approved)
+        self.assertEqual(approved_article.approved_by, self.editor)
         mocked_post.assert_called_once()
 
     def test_reader_cannot_approve_article(self):

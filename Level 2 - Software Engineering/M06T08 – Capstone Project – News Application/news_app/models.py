@@ -54,6 +54,12 @@ class Article(models.Model):
         related_name='articles')
     created_at = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_articles')
     publisher = models.ForeignKey(
         Publisher,
         on_delete=models.SET_NULL,

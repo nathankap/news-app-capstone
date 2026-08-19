@@ -13,4 +13,32 @@
         <button type="submit">{{ submit_label }}</button>
     </form>
 </section>
+
+{% if publishers is not None %}
+<section class="card">
+    <h3>Existing Publishers</h3>
+    {% if publishers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Editors</th>
+                    <th>Journalists</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for publisher in publishers %}
+                    <tr>
+                        <td>{{ publisher.name }}</td>
+                        <td>{% for editor in publisher.editors.all %}{{ editor.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                        <td>{% for journalist in publisher.journalists.all %}{{ journalist.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No publishers have been created yet.</p>
+    {% endif %}
+</section>
+{% endif %}
 {% endblock %}
