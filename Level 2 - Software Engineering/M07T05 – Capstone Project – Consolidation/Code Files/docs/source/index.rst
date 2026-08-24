@@ -1,19 +1,20 @@
-.. News App documentation master file, created by
-   sphinx-quickstart on Sun Aug 23 21:19:29 2026.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-News App documentation
+News App Documentation
 ======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+This documentation is designed to help you quickly run the app, understand the
+main role workflow, and find API/code references.
+
+Start here if you are new:
+
+* :doc:`quick_start`
+* :doc:`user_guide`
 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   quick_start
+   user_guide
    modules
 
