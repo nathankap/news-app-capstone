@@ -1,3 +1,5 @@
+"""Website and API views for articles and newsletters."""
+
 import requests
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,6 +13,7 @@ from .serializers import ArticleSerializer, NewsletterSerializer
 
 
 def home(request):
+    """Render the home page with approved articles and newsletters."""
     articles = Article.objects.filter(
         approved=True).order_by('-created_at')[:5]
     newsletters = Newsletter.objects.order_by('-created_at')[:5]
@@ -22,6 +25,7 @@ def home(request):
 
 
 def _notify_approval(article):
+    """Notify external log service when an article is approved."""
     try:
         requests.post('http://127.0.0.1:8001/api/approved/', json={
             'article_id': article.id,
@@ -33,6 +37,7 @@ def _notify_approval(article):
 
 
 def approve_article(request, article_id):
+    """Allow editors to approve an article and trigger notification."""
     article = get_object_or_404(Article, id=article_id)
     if request.user.is_authenticated and getattr(
             request.user, 'role', None) == 'editor':
@@ -45,6 +50,7 @@ def approve_article(request, article_id):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def article_list_create(request):
+    """List approved articles or create a new article for journalists."""
     if request.method == 'GET':
         articles = Article.objects.filter(
             approved=True).order_by('-created_at')
@@ -65,6 +71,7 @@ def article_list_create(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def article_subscribed(request):
+    """Return reader-only feed filtered by current subscriptions."""
     if request.user.role != 'reader':
         articles = Article.objects.filter(
             approved=True).order_by('-created_at')
@@ -87,6 +94,7 @@ def article_subscribed(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def article_detail(request, article_id):
+    """Retrieve, update, or delete a single article by role rules."""
     article = get_object_or_404(Article, id=article_id)
     if request.method == 'GET':
         serializer = ArticleSerializer(article)
@@ -113,6 +121,7 @@ def article_detail(request, article_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def approved_log(request):
+    """Receive callback payload for approved article events."""
     return Response({'detail': 'approved article logged',
                      'article_id': request.data.get('article_id')},
                     status=status.HTTP_201_CREATED)
@@ -121,6 +130,7 @@ def approved_log(request):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def newsletter_list_create(request):
+    """List newsletters or create one for journalist/editor roles."""
     if request.method == 'GET':
         newsletters = Newsletter.objects.all()
         serializer = NewsletterSerializer(newsletters, many=True)
