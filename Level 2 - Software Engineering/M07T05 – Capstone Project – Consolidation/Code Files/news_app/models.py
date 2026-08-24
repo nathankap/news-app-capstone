@@ -1,8 +1,12 @@
+"""Database models for users, publishers, articles, and newsletters."""
+
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
 
 
 class CustomUser(AbstractUser):
+    """Application user with role-based publishing subscriptions."""
+
     ROLE_CHOICES = [
         ('reader', 'Reader'),
         ('editor', 'Editor'),
@@ -20,6 +24,7 @@ class CustomUser(AbstractUser):
         related_name='reader_subscribers')
 
     def save(self, *args, **kwargs):
+        """Persist user and enforce role subscriptions/group membership."""
         super().save(*args, **kwargs)
         if self.role == 'journalist':
             self.subscribed_publishers.clear()
@@ -31,6 +36,8 @@ class CustomUser(AbstractUser):
 
 
 class Publisher(models.Model):
+    """Publisher entity that manages editors and journalists."""
+
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     editors = models.ManyToManyField(
@@ -45,6 +52,8 @@ class Publisher(models.Model):
 
 
 class Article(models.Model):
+    """News article written by a journalist and optionally approved."""
+
     title = models.CharField(max_length=200)
     content = models.TextField()
     author = models.ForeignKey(
@@ -64,6 +73,8 @@ class Article(models.Model):
 
 
 class Newsletter(models.Model):
+    """Newsletter containing a collection of published articles."""
+
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
