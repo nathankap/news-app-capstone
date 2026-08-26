@@ -1,0 +1,11 @@
+Partial derivatives are used when a function has multiple variables. These derivatives measure how the 
+function can change with respect to one variable while keeping all the other variables constant. 
+
+For example, if a function depends on x and y, then a partial derivative with respect to x shows
+how the function can change while y stays the same. 
+
+Ordinary derivatives are used when a function only has one independent variable. These derivatives measure
+how the function changes as that variable changes.
+
+The main difference between these two is that partial derivatives deal with multivariable functions while
+keeping one variable constant, whereas ordinary derivatives usually deal with single-variable functions.
