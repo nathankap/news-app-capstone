@@ -1,3 +1,5 @@
+"""URL pattern routing definitions for news_app views and API endpoints."""
+
 from django.urls import path
 from . import views
 
