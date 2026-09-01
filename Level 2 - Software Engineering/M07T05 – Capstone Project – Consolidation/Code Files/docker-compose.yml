@@ -3,10 +3,10 @@ services:
     image: mariadb:10.11
     restart: always
     environment:
-      MYSQL_DATABASE: newsdb
-      MYSQL_USER: newsuser
-      MYSQL_PASSWORD: newspassword
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -28,11 +28,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_NAME=newsdb
-      - DB_USER=newsuser
-      - DB_PASSWORD=newspassword
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=db
-      - DB_PORT=3306
+      - DB_PORT=${DB_PORT}
     depends_on:
       db:
         condition: service_healthy
