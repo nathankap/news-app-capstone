@@ -1,143 +1,111 @@
 # News Application
 
-A modular Django web application and REST API for publishing news articles and newsletters with role-based access control (Readers, Journalists, Editors).
+A Django news application and REST API with role-based access control for readers, journalists, and editors. MariaDB is the default database.
 
-## Features
+## Local Setup with MariaDB
 
-- **Custom User Roles**: Readers, Journalists, and Editors.
-- **Article & Newsletter Management**: Creation, viewing, approval workflows, and subscriptions.
-- **REST API Endpoints**: Authentication, article feeds, subscription filtering, and newsletter endpoints.
-- **Automated Testing & Sphinx Documentation**: Full test coverage and auto-generated Sphinx docs.
-- **Containerised Deployment**: Single container Dockerfile & multi-container Docker Compose setup with MariaDB.
+Prerequisites: Git, Python 3.12+, and a running MariaDB server.
 
----
+1. Clone the repository and enter the new project folder.
 
-## Prerequisites
+	```powershell
+	git clone https://github.com/nathankap/news-app-capstone.git
+	cd news-app-capstone
+	```
 
-- Python 3.12+ (for local venv setup)
-- Docker & Docker Compose (for containerised deployment)
+2. Create and activate a virtual environment inside the project folder.
 
----
+	```powershell
+	python -m venv .venv
+	.\.venv\Scripts\Activate.ps1
+	```
 
-## 1. Local Setup with Virtual Environment (venv)
+3. Install dependencies.
 
-### Step 1: Create and Activate Virtual Environment
+	```powershell
+	pip install -r requirements.txt
+	```
 
-**On Windows (PowerShell):**
+4. Create the database and user. Start MariaDB, then sign in as its root user. Enter the root password when prompted.
+
+	```powershell
+	mysql -u root -p
+	```
+
+	Run the following SQL, replacing both example passwords with secure values:
+
+	```sql
+	CREATE DATABASE newsdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	CREATE USER 'newsuser'@'localhost' IDENTIFIED BY 'replace_with_a_secure_password';
+	GRANT ALL PRIVILEGES ON newsdb.* TO 'newsuser'@'localhost';
+	FLUSH PRIVILEGES;
+	EXIT;
+	```
+
+5. Create your local configuration file and update its password values to match the database user you created.
+
+	```powershell
+	Copy-Item .env.example .env
+	```
+
+	`.env` contains `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, and `DB_PORT`. It is excluded from Git; do not commit credentials.
+
+6. Apply migrations and start the application.
+
+	```powershell
+	python manage.py migrate
+	python manage.py runserver
+	```
+
+	Open `http://127.0.0.1:8000/`.
+
+## Docker Compose Setup
+
+Prerequisite: Docker Desktop must be installed and its engine must be running.
+
+1. Clone the repository and enter the new project folder.
+
+	```powershell
+	git clone https://github.com/nathankap/news-app-capstone.git
+	cd news-app-capstone
+	```
+
+2. Create the Docker environment configuration and replace the example password values.
+
+	```powershell
+	Copy-Item .env.example .env
+	```
+
+3. Build and start the Django and MariaDB containers.
+
+	```powershell
+	docker compose up --build
+	```
+
+	Docker Compose creates the MariaDB database from `.env`, waits for it to become available, applies migrations, and serves the app at `http://127.0.0.1:8000/`.
+
+4. Stop the containers when finished.
+
+	```powershell
+	docker compose down
+	```
+
+	Use `docker compose down -v` only when you also want to remove the persisted database data.
+
+## Documentation and Tests
+
+Generated Sphinx documentation is in `docs/_build/html/index.html`. Rebuild it with:
+
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+python -m sphinx -b html docs/source docs/_build/html
 ```
 
-**On Linux/macOS:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+Run the test suite with:
 
-### Step 2: Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 3: Environment Variables & Database Configuration
-
-By default, the application runs on SQLite (`db.sqlite3`). To connect to a MariaDB/MySQL database server, set the following environment variables on your system:
-
-- `DB_NAME`: Database name (e.g., `newsdb`)
-- `DB_USER`: Database user (e.g., `newsuser`)
-- `DB_PASSWORD`: Database user password
-- `DB_HOST`: Database server hostname or IP address (e.g., `localhost` or `db`)
-- `DB_PORT`: Database port (default: `3306`)
-
-> **Security Note:** Never commit database passwords, API keys, or secret tokens directly to a repository. Store credentials in environment variables or a local `.env` file excluded by `.gitignore`.
-
-### Step 4: Run Migrations
-
-```bash
-python manage.py migrate
-```
-
-### Step 5: Start Development Server
-
-```bash
-python manage.py runserver 0.0.0.0:8000
-```
-
-Open your browser and navigate to `http://127.0.0.1:8000/`.
-
----
-
-## 2. Containerised Setup with Docker & Docker Compose
-
-### Option A: Multi-Container Setup using Docker Compose (Recommended)
-
-Docker Compose automatically sets up both the **Django Web Application** container and a **MariaDB Database** container (`db` host) with automatic networking and health checks.
-
-#### Start Application Stack:
-```bash
-docker-compose up --build
-```
-
-- The Django app will automatically run database migrations on startup and launch at `http://127.0.0.1:8000/`.
-- MariaDB will run on port `3306` inside the `db` service.
-
-#### Stop Application Stack:
-```bash
-docker-compose down
-```
-
-#### Stop Stack and Remove Data Volumes:
-```bash
-docker-compose down -v
-```
-
----
-
-### Option B: Standalone Docker Image
-
-To build and run the Django application image directly (using default SQLite storage):
-
-#### Build Image:
-```bash
-docker build -t news-app:latest .
-```
-
-#### Run Container:
-```bash
-docker run --rm -p 8000:8000 news-app:latest
-```
-
-Open `http://127.0.0.1:8000/` in your browser.
-
----
-
-## 3. Sphinx Documentation
-
-Generated documentation is located in the `docs/` folder.
-
-To rebuild the Sphinx documentation locally:
-
-```bash
-cd docs
-.\make.bat html
-```
-
-Or using `sphinx-build`:
-
-```bash
-python -m sphinx -b html docs/source docs/build/html
-```
-
-View the documentation by opening `docs/build/html/index.html` or `docs/_build/html/index.html` in your web browser.
-
----
-
-## 4. Running Automated Tests
-
-Run the Django test suite to verify application endpoints and role permissions:
-
-```bash
+```powershell
 python manage.py test news_app
 ```
+
+### Optional SQLite Setup
+
+MariaDB is the required default. For a temporary SQLite-only experiment, change the `DATABASES['default']` settings to Django's SQLite configuration; do not use that configuration for the standard project setup.

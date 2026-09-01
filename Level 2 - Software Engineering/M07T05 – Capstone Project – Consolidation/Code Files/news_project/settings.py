@@ -13,17 +13,20 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DB_NAME = os.environ.get('DB_NAME', '')
-DB_USER = os.environ.get('DB_USER', '')
-DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
+load_dotenv(BASE_DIR / '.env')
+
+DB_NAME = os.environ.get('DB_NAME', 'newsdb')
+DB_USER = os.environ.get('DB_USER', 'newsuser')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'newspassword')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = os.environ.get('DB_PORT', '3306')
 
-# MariaDB is the expected database for this project.
-# Set DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, and DB_PORT to use it.
+# MariaDB is the required default database for this project.
 
 
 # Quick-start development settings - unsuitable for production
@@ -87,12 +90,12 @@ WSGI_APPLICATION = 'news_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql' if DB_NAME else 'django.db.backends.sqlite3',  # noqa: E501
-        'NAME': DB_NAME if DB_NAME else str(BASE_DIR / 'db.sqlite3'),
-        'USER': DB_USER if DB_NAME else '',
-        'PASSWORD': DB_PASSWORD if DB_NAME else '',
-        'HOST': DB_HOST if DB_NAME else '',
-        'PORT': DB_PORT if DB_NAME else '',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 

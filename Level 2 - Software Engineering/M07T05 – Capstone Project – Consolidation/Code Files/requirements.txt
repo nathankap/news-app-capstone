@@ -7,7 +7,9 @@ djangorestframework==3.18.0
 idna==3.18
 mysqlclient==2.2.8
 pycodestyle==2.14.0
+python-dotenv==1.2.1
 requests==2.34.2
+Sphinx==9.1.0
 sqlparse==0.5.5
 tzdata==2026.3
 urllib3==2.7.0
