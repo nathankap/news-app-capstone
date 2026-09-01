@@ -119,6 +119,20 @@ migrations automatically.</p>
 </li>
 </ol>
 </section>
+<section id="optional-sqlite-setup">
+<h2>Optional SQLite Setup<a class="headerlink" href="#optional-sqlite-setup" title="Link to this heading">¶</a></h2>
+<p>MariaDB is the required default. For a temporary SQLite-only experiment,
+replace <code class="docutils literal notranslate"><span class="pre">DATABASES</span></code> in <code class="docutils literal notranslate"><span class="pre">news_project/settings.py</span></code> with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+   <span class="s1">'default'</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s1">'ENGINE'</span><span class="p">:</span> <span class="s1">'django.db.backends.sqlite3'</span><span class="p">,</span>
+      <span class="s1">'NAME'</span><span class="p">:</span> <span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s1">'db.sqlite3'</span><span class="p">,</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Do not use this configuration for the standard project setup.</p>
+</section>
 </section>
 
 
@@ -152,6 +166,7 @@ migrations automatically.</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#run-with-python-venv">Run with Python (venv)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-with-docker">Run with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-sqlite-setup">Optional SQLite Setup</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
