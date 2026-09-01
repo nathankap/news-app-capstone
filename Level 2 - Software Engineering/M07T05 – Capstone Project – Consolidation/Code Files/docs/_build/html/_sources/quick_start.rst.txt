@@ -96,3 +96,20 @@ Docker Desktop must be installed and its engine must be running.
    .. code-block:: powershell
 
       docker compose down
+
+Optional SQLite Setup
+---------------------
+
+MariaDB is the required default. For a temporary SQLite-only experiment,
+replace ``DATABASES`` in ``news_project/settings.py`` with:
+
+.. code-block:: python
+
+   DATABASES = {
+      'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db.sqlite3',
+      }
+   }
+
+Do not use this configuration for the standard project setup.

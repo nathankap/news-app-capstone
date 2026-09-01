@@ -108,4 +108,15 @@ python manage.py test news_app
 
 ### Optional SQLite Setup
 
-MariaDB is the required default. For a temporary SQLite-only experiment, change the `DATABASES['default']` settings to Django's SQLite configuration; do not use that configuration for the standard project setup.
+MariaDB is the required default. For a temporary SQLite-only experiment, replace `DATABASES` in `news_project/settings.py` with:
+
+```python
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': BASE_DIR / 'db.sqlite3',
+	}
+}
+```
+
+Do not use this configuration for the standard project setup.
