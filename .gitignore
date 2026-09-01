@@ -204,3 +204,6 @@ __marimo__/
 
 # Ignore Mac file system files
 .DS_Store
+
+# Large files
+Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products_May19.csv
