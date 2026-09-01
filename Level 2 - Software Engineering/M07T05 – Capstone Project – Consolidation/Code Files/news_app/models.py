@@ -48,6 +48,7 @@ class Publisher(models.Model):
         'CustomUser', blank=True, related_name='publisher_journalists')
 
     def __str__(self):
+        """Return the string representation of the publisher."""
         return self.name
 
 
@@ -69,6 +70,7 @@ class Article(models.Model):
         blank=True)
 
     def __str__(self):
+        """Return the string representation of the article title."""
         return self.title
 
 
@@ -85,4 +87,5 @@ class Newsletter(models.Model):
     articles = models.ManyToManyField(Article, blank=True)
 
     def __str__(self):
+        """Return the string representation of the newsletter title."""
         return self.title
