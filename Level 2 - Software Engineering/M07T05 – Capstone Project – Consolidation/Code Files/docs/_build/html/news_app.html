@@ -69,10 +69,12 @@
 </section>
 <section id="module-news_app.admin">
 <span id="news-app-admin-module"></span><h2>news_app.admin module<a class="headerlink" href="#module-news_app.admin" title="Link to this heading">¶</a></h2>
+<p>Django admin site registrations for CustomUser, Publisher, Article, and Newsletter models.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.admin.ArticleAdmin">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.admin.</span></span><span class="sig-name descname"><span class="pre">ArticleAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.admin.ArticleAdmin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin configuration for Article model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.admin.ArticleAdmin.list_display">
 <span class="sig-name descname"><span class="pre">list_display</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',</span> <span class="pre">'author',</span> <span class="pre">'publisher',</span> <span class="pre">'approved',</span> <span class="pre">'created_at')</span></span><a class="headerlink" href="#news_app.admin.ArticleAdmin.list_display" title="Link to this definition">¶</a></dt>
@@ -99,6 +101,7 @@
 <dt class="sig sig-object py" id="news_app.admin.CustomUserAdmin">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.admin.</span></span><span class="sig-name descname"><span class="pre">CustomUserAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.admin.CustomUserAdmin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin configuration for CustomUser model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.admin.CustomUserAdmin.list_display">
 <span class="sig-name descname"><span class="pre">list_display</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('username',</span> <span class="pre">'role',</span> <span class="pre">'is_staff',</span> <span class="pre">'is_active')</span></span><a class="headerlink" href="#news_app.admin.CustomUserAdmin.list_display" title="Link to this definition">¶</a></dt>
@@ -120,6 +123,7 @@
 <dt class="sig sig-object py" id="news_app.admin.NewsletterAdmin">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.admin.</span></span><span class="sig-name descname"><span class="pre">NewsletterAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.admin.NewsletterAdmin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin configuration for Newsletter model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.admin.NewsletterAdmin.list_display">
 <span class="sig-name descname"><span class="pre">list_display</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',</span> <span class="pre">'author',</span> <span class="pre">'created_at')</span></span><a class="headerlink" href="#news_app.admin.NewsletterAdmin.list_display" title="Link to this definition">¶</a></dt>
@@ -141,6 +145,7 @@
 <dt class="sig sig-object py" id="news_app.admin.PublisherAdmin">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.admin.</span></span><span class="sig-name descname"><span class="pre">PublisherAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.admin.PublisherAdmin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin configuration for Publisher model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.admin.PublisherAdmin.list_display">
 <span class="sig-name descname"><span class="pre">list_display</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('name',</span> <span class="pre">'created_at')</span></span><a class="headerlink" href="#news_app.admin.PublisherAdmin.list_display" title="Link to this definition">¶</a></dt>
@@ -156,10 +161,12 @@
 </section>
 <section id="module-news_app.apps">
 <span id="news-app-apps-module"></span><h2>news_app.apps module<a class="headerlink" href="#module-news_app.apps" title="Link to this heading">¶</a></h2>
+<p>App configuration module for news_app.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.apps.NewsAppConfig">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.apps.</span></span><span class="sig-name descname"><span class="pre">NewsAppConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.apps.NewsAppConfig" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<p>Application configuration for the news_app Django application.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.apps.NewsAppConfig.default_auto_field">
 <span class="sig-name descname"><span class="pre">default_auto_field</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'django.db.models.BigAutoField'</span></span><a class="headerlink" href="#news_app.apps.NewsAppConfig.default_auto_field" title="Link to this definition">¶</a></dt>
@@ -173,7 +180,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="news_app.apps.NewsAppConfig.ready">
 <span class="sig-name descname"><span class="pre">ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#news_app.apps.NewsAppConfig.ready" title="Link to this definition">¶</a></dt>
-<dd><p>Override this method in subclasses to run code when Django starts.</p>
+<dd><p>Import signals when application registry is ready.</p>
 </dd></dl>
 
 </dd></dl>
@@ -819,14 +826,17 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </section>
 <section id="module-news_app.serializers">
 <span id="news-app-serializers-module"></span><h2>news_app.serializers module<a class="headerlink" href="#module-news_app.serializers" title="Link to this heading">¶</a></h2>
+<p>Serializers for API endpoints transforming models to JSON representation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.serializers.ArticleSerializer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.serializers.</span></span><span class="sig-name descname"><span class="pre">ArticleSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.serializers.ArticleSerializer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Serializer for Article objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.serializers.ArticleSerializer.Meta">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#news_app.serializers.ArticleSerializer.Meta" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta options for ArticleSerializer.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.serializers.ArticleSerializer.Meta.fields">
 <span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'title',</span> <span class="pre">'content',</span> <span class="pre">'author',</span> <span class="pre">'approved',</span> <span class="pre">'publisher',</span> <span class="pre">'created_at']</span></span><a class="headerlink" href="#news_app.serializers.ArticleSerializer.Meta.fields" title="Link to this definition">¶</a></dt>
@@ -851,10 +861,12 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <dt class="sig sig-object py" id="news_app.serializers.NewsletterSerializer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.serializers.</span></span><span class="sig-name descname"><span class="pre">NewsletterSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.serializers.NewsletterSerializer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Serializer for Newsletter objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.serializers.NewsletterSerializer.Meta">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#news_app.serializers.NewsletterSerializer.Meta" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta options for NewsletterSerializer.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.serializers.NewsletterSerializer.Meta.fields">
 <span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'title',</span> <span class="pre">'description',</span> <span class="pre">'author',</span> <span class="pre">'created_at',</span> <span class="pre">'articles']</span></span><a class="headerlink" href="#news_app.serializers.NewsletterSerializer.Meta.fields" title="Link to this definition">¶</a></dt>
@@ -879,10 +891,12 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <dt class="sig sig-object py" id="news_app.serializers.PublisherSerializer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.serializers.</span></span><span class="sig-name descname"><span class="pre">PublisherSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.serializers.PublisherSerializer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Serializer for Publisher objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.serializers.PublisherSerializer.Meta">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#news_app.serializers.PublisherSerializer.Meta" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta options for PublisherSerializer.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.serializers.PublisherSerializer.Meta.fields">
 <span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'name',</span> <span class="pre">'created_at']</span></span><a class="headerlink" href="#news_app.serializers.PublisherSerializer.Meta.fields" title="Link to this definition">¶</a></dt>
@@ -907,10 +921,12 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <dt class="sig sig-object py" id="news_app.serializers.UserSerializer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">news_app.serializers.</span></span><span class="sig-name descname"><span class="pre">UserSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.serializers.UserSerializer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Serializer for CustomUser objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="news_app.serializers.UserSerializer.Meta">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#news_app.serializers.UserSerializer.Meta" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Meta options for UserSerializer.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="news_app.serializers.UserSerializer.Meta.fields">
 <span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'username',</span> <span class="pre">'role']</span></span><a class="headerlink" href="#news_app.serializers.UserSerializer.Meta.fields" title="Link to this definition">¶</a></dt>
@@ -929,10 +945,12 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </section>
 <section id="module-news_app.signals">
 <span id="news-app-signals-module"></span><h2>news_app.signals module<a class="headerlink" href="#module-news_app.signals" title="Link to this heading">¶</a></h2>
+<p>Signal receivers for automatic group and permission creation.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="news_app.signals.create_groups_and_permissions">
 <span class="sig-prename descclassname"><span class="pre">news_app.signals.</span></span><span class="sig-name descname"><span class="pre">create_groups_and_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news_app.signals.create_groups_and_permissions" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create default user roles and assign permissions after migrations.</p>
+</dd></dl>
 
 </section>
 <section id="module-news_app.tests">
@@ -996,6 +1014,7 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 </section>
 <section id="module-news_app.urls">
 <span id="news-app-urls-module"></span><h2>news_app.urls module<a class="headerlink" href="#module-news_app.urls" title="Link to this heading">¶</a></h2>
+<p>URL pattern routing definitions for news_app views and API endpoints.</p>
 </section>
 <section id="module-news_app.views">
 <span id="news-app-views-module"></span><h2>news_app.views module<a class="headerlink" href="#module-news_app.views" title="Link to this heading">¶</a></h2>
